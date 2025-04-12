@@ -163,6 +163,30 @@ AUDIT_LOG_ENABLED=true  # 审计日志
 - Redis 写入：< 10ms
 - 缓存命中率：> 95%
 
+### 密钥轮换系统
+
+#### 功能特点
+- [x] 自动密钥生成
+- [x] 定时密钥轮换
+- [x] 平滑过渡机制
+- [x] 密钥备份恢复
+- [x] 密钥过期管理
+- [x] 多环境支持
+
+#### 轮换策略
+- 生产环境：30天轮换一次
+- 开发环境：90天轮换一次
+- 提前5分钟生成新密钥
+- 支持密钥回滚
+- 密钥版本控制
+
+#### 安全特性
+- RSA 2048位加密
+- 密钥文件加密存储
+- 访问权限控制
+- 密钥使用审计
+- 异常监控告警
+
 ## 功能清单
 
 ### 用户认证功能
@@ -240,6 +264,146 @@ AUDIT_LOG_ENABLED=true  # 审计日志
    - [ ] SIEM 系统集成
    - [ ] 实时安全控制台
 
+### 高级安全功能
+
+1. **数据安全**：
+   - [x] 静态数据加密
+   - [x] 传输中数据加密
+   - [ ] 敏感信息脱敏
+   - [ ] 数据库字段级加密
+   - [ ] 个人身份信息(PII)保护
+   - [ ] 符合 GDPR 数据保护需求
+   - [ ] 数据访问审计日志
+
+2. **防攻击措施**：
+   - [ ] 分布式拒绝服务(DDoS)防护
+   - [ ] DNS 重绑定攻击防护
+   - [ ] HTTP 参数污染防护
+   - [ ] 请求走私防护
+   - [ ] 服务器端请求伪造(SSRF)防护
+   - [ ] 依赖项漏洞自动扫描
+   - [ ] WAF 集成支持
+
+3. **高级认证安全**：
+   - [x] 持续认证
+   - [ ] 自适应认证逻辑
+   - [ ] 风险评分登录
+   - [ ] 可疑活动验证挑战
+   - [ ] 会话保险箱
+   - [ ] 特权会话录制
+   - [ ] 零信任架构支持
+
+4. **合规性支持**：
+   - [ ] SOC 2 合规性
+   - [ ] HIPAA 合规性
+   - [ ] PCI DSS 合规性
+   - [ ] GDPR 合规性
+   - [ ] CCPA 合规性
+   - [ ] 合规性控制面板
+   - [ ] 自定义合规性规则
+
+### API 与集成
+
+1. **认证 API**：
+   - [x] RESTful 身份认证端点
+   - [ ] GraphQL 支持
+   - [x] 令牌管理
+   - [x] 刷新令牌机制
+   - [x] 会话管理
+   - [x] API 密钥轮换
+   - [ ] OAuth 2.1 支持
+   - [x] JWT 签名验证 API
+
+2. **用户管理 API**：
+   - [x] 用户 CRUD 操作
+   - [x] 角色与权限管理
+   - [ ] 组织结构管理
+   - [ ] 批量用户导入/导出
+   - [ ] 用户合并操作
+   - [x] 身份验证
+   - [ ] 自定义身份提供商集成
+
+3. **集成功能**：
+   - [ ] 第三方系统对接
+   - [ ] Webhook 支持
+   - [ ] API 密钥管理
+   - [ ] SDK 支持
+   - [ ] 身份联合
+   - [ ] 事件流
+   - [ ] 自定义身份验证流程
+
+4. **API 文档**：
+   - [x] Swagger/OpenAPI 集成
+   - [x] 交互式 API 测试工具
+   - [x] 示例请求与响应
+   - [x] 权限标记
+   - [ ] 版本控制
+
+### 前端功能
+
+1. **用户界面**：
+   - [x] 响应式登录页面
+   - [x] 注册页面
+   - [x] 用户语言偏好设置页面
+   - [ ] 密码找回流程
+   - [ ] 用户个人中心
+   - [ ] 账户安全设置
+   - [ ] 安全健康度评分
+   - [ ] 多设备活动状态页面
+
+2. **管理界面**：
+   - [ ] 用户管理面板
+   - [ ] 角色权限管理
+   - [ ] 安全设置管理
+   - [ ] 日志查看与分析
+   - [ ] 系统状态监控
+   - [ ] 安全事件响应控制台
+   - [ ] 威胁情报仪表板
+
+### 开发与部署
+
+1. **开发特性**：
+   - [x] 模块化架构
+   - [ ] 完整的单元测试
+   - [ ] 端到端测试
+   - [x] 详细 API 文档
+   - [x] 示例代码
+   - [x] 安全编码准则
+   - [ ] 漏洞测试工具集成
+
+2. **部署选项**：
+   - [ ] Docker 容器化
+   - [ ] Kubernetes 支持
+   - [ ] CI/CD 配置
+   - [x] 多环境部署
+   - [ ] 监控与日志集成
+   - [ ] 蓝绿部署支持
+   - [ ] 自动安全扫描
+   - [ ] 灾难恢复计划
+
+### 安全治理
+
+1. **安全策略管理**：
+   - [x] 集中化安全策略配置
+   - [x] 基于环境的策略适配
+   - [ ] 安全模板管理
+   - [ ] 安全配置版本控制
+   - [ ] 策略合规性检查
+
+2. **威胁情报**：
+   - [ ] 已知威胁检测
+   - [ ] 威胁情报订阅
+   - [ ] IP 信誉服务集成
+   - [ ] 恶意行为识别
+   - [ ] 安全情报共享
+
+3. **响应与恢复**：
+   - [ ] 安全事件响应流程
+   - [ ] 自动化隔离措施
+   - [ ] 取证数据收集
+   - [ ] 事后分析工具
+   - [ ] 业务连续性计划
+
 ## API 文档
 
 启动服务后访问：`http://localhost:8101/api/docs`
@@ -313,6 +477,130 @@ nest g service service-name
   - Swagger集成
   - API端点文档
   - 请求/响应示例
+
+### v0.2.0 (最新)
+- 实现API路径前缀配置
+  - 所有API接口添加`/api`前缀
+  - 前端页面保持原有路径不变
+- 实现前端页面
+  - 响应式登录页面
+  - 注册页面
+  - 用户语言偏好设置页面
+- 实现国际化支持
+  - 添加用户语言偏好设置
+  - 支持中英文切换
+- 安全性改进
+  - 优化认证流程
+  - 增强前端表单验证
+
+## Swagger 集成指南
+
+### 安装依赖
+
+```bash
+npm install @nestjs/swagger swagger-ui-express
+```
+
+### 配置 Swagger
+
+在 `main.ts` 文件中添加以下代码：
+
+```typescript
+import { NestFactory } from "@nestjs/core";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { AppModule } from "./app.module";
+import { ValidationPipe } from "@nestjs/common";
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // 全局验证管道
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    })
+  );
+
+  // Swagger 配置
+  const config = new DocumentBuilder()
+    .setTitle("NestJS Auth API")
+    .setDescription("认证系统 API 文档")
+    .setVersion("1.0")
+    .addBearerAuth()
+    .addTag("auth", "认证相关接口")
+    .addTag("users", "用户管理接口")
+    .addTag("roles", "角色权限接口")
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup("api/docs", app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
+
+  await app.listen(process.env.PORT || 8101);
+}
+bootstrap();
+```
+
+### 使用装饰器增强 API 文档
+
+在控制器和 DTO 中使用 Swagger 装饰器:
+
+```typescript
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiProperty,
+} from "@nestjs/swagger";
+
+// DTO 示例
+export class CreateUserDto {
+  @ApiProperty({ example: "john.doe", description: "用户名" })
+  username: string;
+
+  @ApiProperty({ example: "john@example.com", description: "电子邮件" })
+  email: string;
+
+  @ApiProperty({ example: "StrongPassword123!", description: "密码" })
+  password: string;
+}
+
+// 控制器示例
+@ApiTags("users")
+@Controller("users")
+export class UsersController {
+  @Post()
+  @ApiOperation({ summary: "创建新用户" })
+  @ApiResponse({ status: 201, description: "用户创建成功" })
+  @ApiResponse({ status: 400, description: "无效的请求参数" })
+  async create(@Body() createUserDto: CreateUserDto) {
+    // 实现创建用户的逻辑
+  }
+}
+```
+
+### 分组和版本控制
+
+```typescript
+// 创建多个文档实例用于 API 版本管理
+const v1Options = new DocumentBuilder()
+  .setTitle("API v1")
+  .setDescription("Version 1 of the API")
+  .setVersion("1.0")
+  .addBearerAuth()
+  .build();
+
+const v1Document = SwaggerModule.createDocument(app, v1Options, {
+  include: [UsersV1Module, AuthV1Module],
+});
+
+SwaggerModule.setup("api/v1/docs", app, v1Document);
+```
 
 ## 许可证
 
