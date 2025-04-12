@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语言偏好设置</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>语言偏好设置</h1>
+        <div id="message" class="message" style="display: none;"></div>
+        
+        <div class="form-group">
+            <label for="language">选择语言：</label>
+            <select id="language">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        
+        <button class="btn" id="saveBtn">保存设置</button>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="login.html">返回登录页面</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查用户是否已登录
+            const accessToken = localStorage.getItem('access_token');
+            if (!accessToken) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // 获取当前语言偏好
+            fetchUserProfile();
+            
+            // 添加保存按钮事件
+            document.getElementById('saveBtn').addEventListener('click', updateLanguage);
+        });
+        
+        async function fetchUserProfile() {
+            try {
+                const accessToken = localStorage.getItem('access_token');
+                const response = await fetch('/api/users/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // 设置当前语言选项
+                    document.getElementById('language').value = data.preferredLanguage || 'zh';
+                } else {
+                    showMessage('获取用户信息失败，请重新登录', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                showMessage('获取用户信息时发生错误', 'error');
+            }
+        }
+        
+        async function updateLanguage() {
+            try {
+                const language = document.getElementById('language').value;
+                const accessToken = localStorage.getItem('access_token');
+                
+                const response = await fetch('/api/users/language', {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ language })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(language === 'zh' ? '语言偏好已更新为中文' : 'Language preference updated to English', 'success');
+                } else {
+                    const error = await response.json();
+                    showMessage(`更新失败: ${error.message || '未知错误'}`, 'error');
+                }
+            } catch (error) {
+                showMessage('更新语言偏好时发生错误', 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 

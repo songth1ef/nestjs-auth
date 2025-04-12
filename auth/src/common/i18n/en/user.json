@@ -1,0 +1,19 @@
+{
+  "profile": {
+    "getSuccess": "Profile retrieved successfully",
+    "updateSuccess": "Profile updated successfully",
+    "updateLanguageSuccess": "Language preference updated to {language}",
+    "notFound": "User not found"
+  },
+  "account": {
+    "locked": "Your account has been locked due to too many failed login attempts",
+    "unlocked": "Your account has been unlocked",
+    "deleted": "Account deleted successfully"
+  },
+  "validation": {
+    "usernameTooShort": "Username must be at least {min} characters",
+    "invalidEmail": "Please provide a valid email address",
+    "invalidPhoneNumber": "Please provide a valid phone number",
+    "requiredField": "{field} is required"
+  }
+} 

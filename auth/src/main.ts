@@ -1,14 +1,34 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, RequestMethod } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import { join } from 'path';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { HttpAdapterHost } from '@nestjs/core';
+import {
+  ResponseDto,
+  PaginatedResponseDto,
+  ErrorResponseDto,
+} from './common/dto/response.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const httpAdapterHost = app.get(HttpAdapterHost);
+
+  // 设置全局API前缀
+  app.setGlobalPrefix('api', {
+    exclude: [
+      { path: '', method: RequestMethod.GET },
+      { path: 'login', method: RequestMethod.GET },
+      { path: 'register', method: RequestMethod.GET },
+      { path: 'public/(.*)', method: RequestMethod.GET },
+    ],
+  });
 
   // 全局验证管道
   app.useGlobalPipes(
@@ -17,6 +37,15 @@ async function bootstrap() {
       transform: true,
       forbidNonWhitelisted: true,
     }),
+  );
+
+  // 全局响应拦截器
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
+  // 全局异常过滤器
+  app.useGlobalFilters(
+    new AllExceptionsFilter(httpAdapterHost),
+    new HttpExceptionFilter(),
   );
 
   // CORS配置
@@ -35,10 +64,16 @@ async function bootstrap() {
     .addTag('users', '用户管理接口')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [ResponseDto, PaginatedResponseDto, ErrorResponseDto],
+  });
+
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+      docExpansion: 'list',
     },
   });
 
@@ -51,4 +86,5 @@ async function bootstrap() {
   console.log(`应用已启动: http://localhost:${port}`);
   console.log(`Swagger文档: http://localhost:${port}/api/docs`);
 }
+
 bootstrap();

@@ -1,8 +1,15 @@
-import { IsString, IsEmail, IsOptional, MinLength, Matches } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  MinLength,
+  Matches,
+  IsIn,
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
-  @ApiProperty({ example: 'johndoe', description: '用户名' })
+  @ApiProperty({ example: 'johndoe', description: '用户名', minLength: 3 })
   @IsString()
   @MinLength(3)
   username: string;
@@ -17,15 +24,26 @@ export class CreateUserDto {
   @Matches(/^\+[1-9]\d{1,14}$/, { message: '手机号码格式不正确' })
   phoneNumber?: string;
 
-  @ApiProperty({ example: 'StrongPass123!', description: '密码' })
+  @ApiProperty({ example: 'StrongP1!', description: '密码' })
   @IsString()
-  @MinLength(12)
+  @MinLength(8)
   @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
     {
-      message:
-        '密码必须包含大小写字母、数字和特殊字符，且长度至少为12位',
+      message: '密码必须包含大小写字母、数字和特殊字符，且长度至少为8位',
     },
   )
   password: string;
+
+  @ApiProperty({ 
+    example: 'zh', 
+    description: '首选语言', 
+    enum: ['zh', 'en'],
+    default: 'zh',
+    required: false
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['zh', 'en']) // 支持的语言列表
+  preferredLanguage?: string;
 } 

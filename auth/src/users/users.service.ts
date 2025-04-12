@@ -86,6 +86,19 @@ export class UsersService {
     await this.usersRepository.save(user);
   }
 
+  async updatePreferredLanguage(userId: string, language: string): Promise<User> {
+    const user = await this.findById(userId);
+    
+    // 验证语言是否支持
+    const supportedLanguages = ['zh', 'en']; // 可以从配置中获取
+    if (!supportedLanguages.includes(language)) {
+      throw new ConflictException(`不支持的语言: ${language}. 支持的语言: ${supportedLanguages.join(', ')}`);
+    }
+    
+    user.preferredLanguage = language;
+    return this.usersRepository.save(user);
+  }
+
   private parseDuration(duration: string): number {
     const unit = duration.slice(-1);
     const value = parseInt(duration.slice(0, -1), 10);

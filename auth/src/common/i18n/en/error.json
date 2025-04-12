@@ -1,0 +1,22 @@
+{
+  "common": {
+    "internalError": "Internal server error",
+    "notFound": "Resource not found",
+    "badRequest": "Invalid request",
+    "unauthorized": "Unauthorized access",
+    "forbidden": "Access forbidden",
+    "tooManyRequests": "Too many requests, please try again later"
+  },
+  "database": {
+    "connectionError": "Database connection error",
+    "queryError": "Error executing database query",
+    "invalidData": "Invalid data provided"
+  },
+  "validation": {
+    "required": "{field} is required",
+    "format": "Invalid {field} format",
+    "length": "{field} must be between {min} and {max} characters",
+    "min": "{field} must be at least {min}",
+    "max": "{field} must not exceed {max}"
+  }
+} 

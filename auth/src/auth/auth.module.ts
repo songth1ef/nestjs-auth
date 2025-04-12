@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
@@ -6,7 +6,10 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { KeyModule } from './services/key.module';
 import { Algorithm } from 'jsonwebtoken';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
+@Global()
 @Module({
   imports: [
     UsersModule,
@@ -30,7 +33,13 @@ import { Algorithm } from 'jsonwebtoken';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {} 

@@ -89,6 +89,7 @@ export class AuthService {
       return {
         access_token: accessToken,
         refresh_token: refreshToken,
+        preferred_language: user.preferredLanguage,
       };
     } catch (error: unknown) {
       if (error instanceof Error) {

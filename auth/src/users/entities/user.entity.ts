@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BeforeInsert,
+  BeforeUpdate,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
 
@@ -19,6 +27,12 @@ export class User {
   @Exclude()
   @Column()
   password: string;
+
+  // 用于检测密码是否已更改的标志
+  private previousPassword: string;
+
+  @Column({ default: 'zh' })
+  preferredLanguage: string;
 
   @Column({ default: false })
   isEmailVerified: boolean;
@@ -60,15 +74,29 @@ export class User {
   updatedAt: Date;
 
   @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
+  async hashPasswordOnInsert() {
     if (this.password) {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
     }
   }
 
+  @BeforeUpdate()
+  async hashPasswordOnUpdate() {
+    // 只有当密码实际发生变化时才重新哈希
+    if (
+      this.password && 
+      this.previousPassword !== this.password && 
+      !this.password.startsWith('$2b$')
+    ) {
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
+
   async validatePassword(password: string): Promise<boolean> {
+    // 保存当前密码哈希值，用于检测是否发生变化
+    this.previousPassword = this.password;
     return bcrypt.compare(password, this.password);
   }
 } 

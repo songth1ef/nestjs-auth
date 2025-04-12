@@ -1,0 +1,19 @@
+{
+  "profile": {
+    "getSuccess": "获取个人资料成功",
+    "updateSuccess": "更新个人资料成功",
+    "updateLanguageSuccess": "已将语言偏好更新为{language}",
+    "notFound": "用户不存在"
+  },
+  "account": {
+    "locked": "由于登录失败次数过多，您的账户已被锁定",
+    "unlocked": "您的账户已解锁",
+    "deleted": "账户删除成功"
+  },
+  "validation": {
+    "usernameTooShort": "用户名长度不能少于{min}个字符",
+    "invalidEmail": "请提供有效的电子邮件地址",
+    "invalidPhoneNumber": "请提供有效的手机号码",
+    "requiredField": "{field}为必填项"
+  }
+} 
