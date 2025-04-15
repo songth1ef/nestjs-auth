@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -37,12 +37,21 @@ export class AuthController {
     description: '登录成功',
     type: ResponseDto,
   })
-  @ApiResponse({ status: 401, description: '用户名或密码错误' })
+  @ApiResponse({ status: 401, description: '用户名/邮箱或密码错误' })
   async login(@Body() loginDto: LoginDto) {
+    if (!loginDto.username && !loginDto.email) {
+      throw new UnauthorizedException('请提供用户名或邮箱');
+    }
+
+    const identifier = loginDto.username || (loginDto.email as string);
+    const isEmail = identifier.includes('@');
+    
     const user = await this.authService.validateUser(
-      loginDto.username,
+      identifier,
       loginDto.password,
+      isEmail
     );
+    
     return this.authService.login(user);
   }
 

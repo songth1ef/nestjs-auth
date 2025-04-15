@@ -10,12 +10,14 @@ export default function Dashboard() {
   
   useEffect(() => {
     // 验证用户是否已登录
-    const isAuthenticated = localStorage.getItem("auth") === "true";
-    
-    if (!isAuthenticated) {
-      router.push("/login");
-    } else {
-      setLoading(false);
+    if (typeof window !== 'undefined') {
+      const isAuthenticated = localStorage.getItem("auth") === "true";
+      
+      if (!isAuthenticated) {
+        router.push("/login");
+      } else {
+        setLoading(false);
+      }
     }
   }, [router]);
   

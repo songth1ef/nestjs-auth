@@ -14,6 +14,7 @@ import {
   PaginatedResponseDto,
   ErrorResponseDto,
 } from './common/dto/response.dto';
+import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,10 +25,21 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: [
       { path: '', method: RequestMethod.GET },
-      { path: 'login', method: RequestMethod.GET },
-      { path: 'register', method: RequestMethod.GET },
       { path: 'public/(.*)', method: RequestMethod.GET },
     ],
+  });
+
+  // 添加全局中间件处理重定向
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    // 如果不是 API 请求，重定向到前端服务
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/public')) {
+      const frontendUrl = configService.get<string>(
+        'frontend.url',
+        'http://localhost:8102',
+      );
+      return res.redirect(`${frontendUrl}${req.path}`);
+    }
+    next();
   });
 
   // 全局验证管道

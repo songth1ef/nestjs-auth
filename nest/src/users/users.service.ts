@@ -1,9 +1,10 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
+import { PageDto, PageResponseDto, PageMetaDto } from '../common/dto/page.dto';
 
 @Injectable()
 export class UsersService {
@@ -113,5 +114,33 @@ export class UsersService {
       default:
         return 15 * 60 * 1000; // 默认15分钟
     }
+  }
+
+  async findAll(pageDto: PageDto): Promise<PageResponseDto<User>> {
+    const { page, limit, search } = pageDto;
+    const skip = (page - 1) * limit;
+    
+    // 构建查询条件
+    const where = search
+      ? [
+          { username: Like(`%${search}%`) },
+          { email: Like(`%${search}%`) },
+        ]
+      : {};
+    
+    // 执行分页查询
+    const [users, total] = await this.usersRepository.findAndCount({
+      where,
+      skip,
+      take: limit,
+      order: { createdAt: 'DESC' },
+      select: ['id', 'username', 'email', 'roles', 'isActive', 'createdAt', 'lastLoginDate'],
+    });
+    
+    // 创建分页元数据
+    const meta = new PageMetaDto(page, limit, total);
+    
+    // 返回分页结果
+    return new PageResponseDto(users, meta);
   }
 } 

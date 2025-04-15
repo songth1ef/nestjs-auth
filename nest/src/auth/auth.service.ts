@@ -23,9 +23,19 @@ export class AuthService {
     private keyService: KeyService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<User> {
+  async validateUser(
+    identifier: string, 
+    password: string, 
+    isEmail = false
+  ): Promise<User> {
     try {
-      const user = await this.usersService.findByUsername(username);
+      let user: User;
+      
+      if (isEmail) {
+        user = await this.usersService.findByEmail(identifier);
+      } else {
+        user = await this.usersService.findByUsername(identifier);
+      }
 
       if (user.isLocked) {
         if (user.lockUntil && user.lockUntil > new Date()) {
@@ -41,7 +51,7 @@ export class AuthService {
       await this.usersService.updateLoginAttempts(user, isValid);
 
       if (!isValid) {
-        throw new UnauthorizedException('用户名或密码错误');
+        throw new UnauthorizedException('用户名/邮箱或密码错误');
       }
 
       return user;
@@ -49,7 +59,7 @@ export class AuthService {
       if (error instanceof Error) {
         this.logger.error(`用户验证失败: ${error.message}`, error.stack);
       }
-      throw error;
+      throw new UnauthorizedException('用户名/邮箱或密码错误');
     }
   }
 

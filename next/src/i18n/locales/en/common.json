@@ -1,0 +1,47 @@
+{
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "email": "Email address",
+      "identifier": "Username or Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Sign in",
+      "loading": "Signing in...",
+      "or": "Or",
+      "registerLink": "Create a new account"
+    },
+    "register": {
+      "title": "Create a new account",
+      "username": "Username",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "terms": "I agree to the Terms of Service",
+      "submit": "Register",
+      "loading": "Registering...",
+      "or": "Or",
+      "loginLink": "Sign in to existing account"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "description": "Enter your email address and we'll send you a link to reset your password",
+      "email": "Email address",
+      "submit": "Send reset link",
+      "loading": "Sending...",
+      "backToLogin": "Back to sign in",
+      "successTitle": "Email sent",
+      "successMessage": "Please check your email for instructions to reset your password"
+    }
+  },
+  "errors": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "password": "Password must be at least 8 characters",
+    "confirmPassword": "Passwords do not match",
+    "username": "Username must be at least 3 characters",
+    "usernameNoAt": "Username cannot contain @ symbol",
+    "unknown": "An unknown error occurred. Please try again later"
+  }
+} 
