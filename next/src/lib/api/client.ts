@@ -10,17 +10,33 @@ class ApiClient {
     this.headers = API_CONFIG.headers
   }
 
+  private getAuthToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token')
+    }
+    return null
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
+    const token = this.getAuthToken()
+    
+    // 构建请求头，如果有token则添加Authorization头
+    const headers: Record<string, string> = {
+      ...this.headers as Record<string, string>,
+      ...(options.headers as Record<string, string> || {}),
+    }
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+    
     const config: RequestInit = {
       ...options,
-      headers: {
-        ...this.headers,
-        ...options.headers,
-      },
+      headers,
       credentials: API_CONFIG.withCredentials ? 'include' : 'same-origin',
     }
 

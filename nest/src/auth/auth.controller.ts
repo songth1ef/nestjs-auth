@@ -2,7 +2,12 @@ import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ResponseDto } from '../common/dto/response.dto';
@@ -45,13 +50,13 @@ export class AuthController {
 
     const identifier = loginDto.username || (loginDto.email as string);
     const isEmail = identifier.includes('@');
-    
+
     const user = await this.authService.validateUser(
       identifier,
       loginDto.password,
-      isEmail
+      isEmail,
     );
-    
+
     return this.authService.login(user);
   }
 
@@ -66,4 +71,4 @@ export class AuthController {
   async refresh(@Body() body: RefreshTokenDto) {
     return this.authService.refreshToken(body.refresh_token);
   }
-} 
+}

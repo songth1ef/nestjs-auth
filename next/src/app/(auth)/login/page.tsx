@@ -6,6 +6,19 @@ import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api/client'
 import Link from 'next/link'
 
+// 定义登录响应类型
+interface LoginResponse {
+  code: number;
+  data: {
+    access_token: string;
+    refresh_token: string;
+    preferred_language?: string;
+  };
+  message: string;
+  success: boolean;
+  timestamp: number;
+}
+
 export default function LoginPage() {
   const { t } = useTranslation()
   const router = useRouter()
@@ -30,13 +43,21 @@ export default function LoginPage() {
         ? { email: identifier, password } 
         : { username: identifier, password }
       
-      await apiClient.login(loginData)
+      const response = await apiClient.login(loginData) as LoginResponse
       // 登录成功后设置本地存储
       if (typeof window !== 'undefined') {
         localStorage.setItem('auth', 'true')
+        // 保存token到localStorage
+        if (response.data && response.data.access_token) {
+          localStorage.setItem('token', response.data.access_token)
+          console.log('Token saved:', response.data.access_token)
+        } else {
+          console.error('No token received in response:', response)
+        }
       }
       router.push('/dashboard')
     } catch (err) {
+      console.error('Login error:', err)
       setError(err instanceof Error ? err.message : t('errors.unknown'))
     } finally {
       setLoading(false)

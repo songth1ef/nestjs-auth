@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -87,15 +91,20 @@ export class UsersService {
     await this.usersRepository.save(user);
   }
 
-  async updatePreferredLanguage(userId: string, language: string): Promise<User> {
+  async updatePreferredLanguage(
+    userId: string,
+    language: string,
+  ): Promise<User> {
     const user = await this.findById(userId);
-    
+
     // 验证语言是否支持
     const supportedLanguages = ['zh', 'en']; // 可以从配置中获取
     if (!supportedLanguages.includes(language)) {
-      throw new ConflictException(`不支持的语言: ${language}. 支持的语言: ${supportedLanguages.join(', ')}`);
+      throw new ConflictException(
+        `不支持的语言: ${language}. 支持的语言: ${supportedLanguages.join(', ')}`,
+      );
     }
-    
+
     user.preferredLanguage = language;
     return this.usersRepository.save(user);
   }
@@ -119,28 +128,33 @@ export class UsersService {
   async findAll(pageDto: PageDto): Promise<PageResponseDto<User>> {
     const { page, limit, search } = pageDto;
     const skip = (page - 1) * limit;
-    
+
     // 构建查询条件
     const where = search
-      ? [
-          { username: Like(`%${search}%`) },
-          { email: Like(`%${search}%`) },
-        ]
+      ? [{ username: Like(`%${search}%`) }, { email: Like(`%${search}%`) }]
       : {};
-    
+
     // 执行分页查询
     const [users, total] = await this.usersRepository.findAndCount({
       where,
       skip,
       take: limit,
       order: { createdAt: 'DESC' },
-      select: ['id', 'username', 'email', 'roles', 'isActive', 'createdAt', 'lastLoginDate'],
+      select: [
+        'id',
+        'username',
+        'email',
+        'roles',
+        'isActive',
+        'createdAt',
+        'lastLoginDate',
+      ],
     });
-    
+
     // 创建分页元数据
     const meta = new PageMetaDto(page, limit, total);
-    
+
     // 返回分页结果
     return new PageResponseDto(users, meta);
   }
-} 
+}

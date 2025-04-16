@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Body, Request, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Body,
+  Request,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -24,10 +32,10 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('profile')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: '获取用户个人资料',
     description: '获取当前登录用户的完整个人资料信息',
-    tags: ['users']
+    tags: ['users'],
   })
   @ApiOkResponse({
     description: '成功获取个人资料',
@@ -40,10 +48,10 @@ export class UsersController {
   }
 
   @Patch('language')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: '更新用户语言偏好',
     description: '设置当前用户的首选语言',
-    tags: ['users'] 
+    tags: ['users'],
   })
   @ApiOkResponse({
     description: '语言偏好更新成功',
@@ -52,28 +60,43 @@ export class UsersController {
   @ApiResponse({ status: 401, description: '未授权访问' })
   @ApiResponse({ status: 400, description: '无效的语言选择' })
   async updateLanguage(
-    @Request() req, 
-    @Body() updateLanguageDto: UpdateLanguageDto
+    @Request() req,
+    @Body() updateLanguageDto: UpdateLanguageDto,
   ) {
     const id = req.user?.id || req.user?.sub;
     const user = await this.usersService.updatePreferredLanguage(
       id,
-      updateLanguageDto.language
+      updateLanguageDto.language,
     );
-    
+
     return {
       messageKey: 'user.profile.updateLanguageSuccess',
       args: { language: updateLanguageDto.language },
-      data: { preferredLanguage: user.preferredLanguage }
+      data: { preferredLanguage: user.preferredLanguage },
     };
   }
 
   @Get()
   @Roles('admin')
   @ApiOperation({ summary: '分页查询用户列表' })
-  @ApiQuery({ name: 'page', required: false, type: Number, description: '页码' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: '每页数量' })
-  @ApiQuery({ name: 'search', required: false, type: String, description: '搜索关键词' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: '页码',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: '每页数量',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: '搜索关键词',
+  })
   @ApiOkResponse({
     description: '用户列表',
     type: PageResponseDto,
@@ -81,4 +104,4 @@ export class UsersController {
   async findAll(@Query() pageDto: PageDto): Promise<PageResponseDto<User>> {
     return await this.usersService.findAll(pageDto);
   }
-} 
+}

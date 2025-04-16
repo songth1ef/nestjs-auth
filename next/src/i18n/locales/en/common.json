@@ -1,47 +1,83 @@
 {
   "auth": {
+    "common": {
+      "email": "Email",
+      "password": "Password",
+      "username": "Username",
+      "submit": "Submit",
+      "orContinueWith": "Or continue with",
+      "processing": "Processing..."
+    },
     "login": {
-      "title": "Sign in to your account",
-      "email": "Email address",
+      "title": "Login to your account",
       "identifier": "Username or Email",
       "password": "Password",
       "rememberMe": "Remember me",
-      "forgotPassword": "Forgot your password?",
-      "submit": "Sign in",
-      "loading": "Signing in...",
+      "forgotPassword": "Forgot password?",
+      "registerLink": "Register a new account",
       "or": "Or",
-      "registerLink": "Create a new account"
+      "submit": "Login",
+      "loading": "Logging in...",
+      "backToLogin": "Back to Login"
     },
     "register": {
       "title": "Create a new account",
       "username": "Username",
-      "email": "Email address",
+      "email": "Email",
       "password": "Password",
-      "confirmPassword": "Confirm password",
-      "terms": "I agree to the Terms of Service",
+      "confirmPassword": "Confirm Password",
+      "agreeToTerms": "I agree to the terms and conditions",
+      "already": "Already have an account?",
+      "loginLink": "Login",
       "submit": "Register",
-      "loading": "Registering...",
-      "or": "Or",
-      "loginLink": "Sign in to existing account"
+      "loading": "Registering..."
     },
     "forgotPassword": {
       "title": "Reset your password",
-      "description": "Enter your email address and we'll send you a link to reset your password",
-      "email": "Email address",
-      "submit": "Send reset link",
-      "loading": "Sending...",
-      "backToLogin": "Back to sign in",
-      "successTitle": "Email sent",
-      "successMessage": "Please check your email for instructions to reset your password"
+      "email": "Email",
+      "submit": "Send Reset Link",
+      "reset": "Reset Password",
+      "backToLogin": "Back to Login",
+      "checkEmail": "Check your email",
+      "resetInstructions": "We have sent password reset instructions to your email.",
+      "emailSent": "Password reset email sent"
     }
   },
   "errors": {
     "required": "This field is required",
     "email": "Please enter a valid email address",
-    "password": "Password must be at least 8 characters",
-    "confirmPassword": "Passwords do not match",
-    "username": "Username must be at least 3 characters",
-    "usernameNoAt": "Username cannot contain @ symbol",
-    "unknown": "An unknown error occurred. Please try again later"
+    "minLength": "Password must be at least 8 characters",
+    "username": "Username must be between 3-20 characters",
+    "unknown": "An unknown error occurred",
+    "general": "An error occurred, please try again later"
+  },
+  "common": {
+    "backToDashboard": "Back to Dashboard",
+    "search": "Search",
+    "itemsPerPage": "items per page",
+    "loading": "Loading..."
+  },
+  "users": {
+    "management": "User Management",
+    "username": "Username",
+    "email": "Email",
+    "roles": "Roles",
+    "status": "Status",
+    "createdAt": "Created At",
+    "lastLogin": "Last Login",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noUsersFound": "No users found",
+    "searchPlaceholder": "Search by username or email"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "first": "First",
+    "last": "Last",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results"
   }
 } 
