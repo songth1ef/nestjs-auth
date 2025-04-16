@@ -8,12 +8,14 @@ import { KeyModule } from './services/key.module';
 import { Algorithm } from 'jsonwebtoken';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { EmailModule } from '../modules/email/email.module';
 
 @Global()
 @Module({
   imports: [
     UsersModule,
     KeyModule,
+    EmailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {

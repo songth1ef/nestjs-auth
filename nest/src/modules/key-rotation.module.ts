@@ -5,4 +5,4 @@ import { KeyRotationService } from '../services/key-rotation.service';
   providers: [KeyRotationService],
   exports: [KeyRotationService],
 })
-export class KeyRotationModule {} 
+export class KeyRotationModule {}

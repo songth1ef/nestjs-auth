@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api/client'
-import { Notification } from '@/components/ui/Notification'
+import { Notification } from '@/components/common/Notification'
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation()
@@ -22,8 +22,9 @@ export default function ForgotPasswordPage() {
     try {
       await apiClient.forgotPassword(email)
       setSuccess(true)
-    } catch (err: any) {
-      setError(err.message || t('errors.general'))
+    } catch (err: Error | unknown) {
+      const errorMessage = err instanceof Error ? err.message : t('errors.general')
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

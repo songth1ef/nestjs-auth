@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -59,23 +59,10 @@ export default function UsersPage() {
     if (!loading && page !== 1) {
       setPage(1);
     }
-  }, [limit, search]); // 当limit或search变化时重置页码
+  }, [limit, search, loading, page]); // 添加missing dependencies
 
-  useEffect(() => {
-    // 验证用户是否已登录
-    if (typeof window !== 'undefined') {
-      const isAuthenticated = localStorage.getItem('auth') === 'true';
-      const token = localStorage.getItem('token');
-      
-      if (!isAuthenticated || !token) {
-        router.push('/login');
-      } else {
-        fetchUsers();
-      }
-    }
-  }, [router, page, limit, search]);
-
-  const fetchUsers = async () => {
+  // 将 fetchUsers 用 useCallback 包装，避免无限循环
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -108,7 +95,21 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, search]); // 添加fetchUsers依赖项
+
+  useEffect(() => {
+    // 验证用户是否已登录
+    if (typeof window !== 'undefined') {
+      const isAuthenticated = localStorage.getItem('auth') === 'true';
+      const token = localStorage.getItem('token');
+      
+      if (!isAuthenticated || !token) {
+        router.push('/login');
+      } else {
+        fetchUsers();
+      }
+    }
+  }, [router, fetchUsers]); // 仅依赖router和fetchUsers
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

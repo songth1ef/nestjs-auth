@@ -157,4 +157,18 @@ export class UsersService {
     // 返回分页结果
     return new PageResponseDto(users, meta);
   }
+
+  async resetPassword(email: string, newPassword: string): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('用户不存在');
+    }
+
+    // 更新密码
+    user.password = newPassword;
+    return this.usersRepository.save(user);
+  }
 }
