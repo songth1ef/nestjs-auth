@@ -9,6 +9,7 @@ import { Algorithm } from 'jsonwebtoken';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { EmailModule } from '../modules/email/email.module';
+import { VerificationService } from './services/verification.service';
 
 @Global()
 @Module({
@@ -19,7 +20,9 @@ import { EmailModule } from '../modules/email/email.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const isSymmetric = configService.get<boolean>('jwt.symmetricEncryption');
+        const isSymmetric = configService.get<boolean>(
+          'jwt.symmetricEncryption',
+        );
         const algorithm = configService.get<Algorithm>('jwt.algorithm');
         return {
           secret: isSymmetric
@@ -37,11 +40,12 @@ import { EmailModule } from '../modules/email/email.module';
   controllers: [AuthController],
   providers: [
     AuthService,
+    VerificationService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
   ],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule, VerificationService],
 })
-export class AuthModule {} 
+export class AuthModule {}

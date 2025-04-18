@@ -4,10 +4,10 @@ import * as nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { I18nService } from 'nestjs-i18n';
+import { EmailTemplateService } from './services/email-template.service';
 
-// 使用any类型临时绕过nodemailer类型问题
-// 生产环境应考虑更精确的类型定义
-type NodemailerTransporter = any;
+// 使用更明确的类型定义
+type NodemailerTransporter = ReturnType<typeof nodemailer.createTransport>;
 
 @Injectable()
 export class EmailService {
@@ -16,6 +16,7 @@ export class EmailService {
 
   constructor(
     private configService: ConfigService,
+    private emailTemplateService: EmailTemplateService,
     @Optional() private readonly i18n?: I18nService,
   ) {
     this.initializeTransporter();
@@ -58,11 +59,13 @@ export class EmailService {
       } as SMTPTransport.Options;
 
       this.transporter = nodemailer.createTransport(config);
-      this.transporter.verify((error: Error | null) => {
-        if (error) {
-          this.logger.error(`邮件服务器连接验证失败: ${error.message}`);
-        }
-      });
+      if (this.transporter) {
+        this.transporter.verify((error: Error | null) => {
+          if (error) {
+            this.logger.error(`邮件服务器连接验证失败: ${error.message}`);
+          }
+        });
+      }
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(`邮件发送器初始化失败: ${err.message}`, err.stack);
@@ -94,27 +97,24 @@ export class EmailService {
         this.configService.get<string>('SMTP_FROM_NAME') ||
         '';
 
-      const appName =
-        this.configService.get<string>('app.name') ||
-        this.configService.get<string>('APP_NAME') ||
-        this.translate('email.common.systemName', lang);
+      // 使用模板服务生成邮件内容
+      const emailContent = this.emailTemplateService.generatePasswordResetEmail(
+        code,
+        lang,
+      );
 
-      // 直接构建邮件主题，不使用翻译
-      const subject =
-        lang === 'zh'
-          ? `${code}是你的验证码 - ${appName}`
-          : `${code} is your verification code - ${appName}`;
-
-      // 直接构建邮件HTML内容
+      // 设置邮件选项
       const mailOptions: Mail.Options = {
         from: fromName ? `"${fromName}" <${from}>` : from,
         to: email,
-        subject,
-        text: this.generateResetPasswordText(code, lang, appName),
-        html: this.generateResetPasswordHtml(code, lang, appName),
+        subject: emailContent.subject,
+        text: emailContent.text,
+        html: emailContent.html,
       };
 
-      await this.transporter.sendMail(mailOptions);
+      if (this.transporter) {
+        await this.transporter.sendMail(mailOptions);
+      }
       return true;
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -123,102 +123,20 @@ export class EmailService {
     }
   }
 
-  /**
-   * 生成密码重置邮件的纯文本内容
-   */
-  private generateResetPasswordText(
-    code: string,
-    lang: string,
-    appName: string,
-  ): string {
-    if (lang === 'zh') {
-      return `${code} 是你的验证码
-
-您好，
-
-您正在请求重置密码。请使用上面的验证码完成密码重置流程。
-此验证码将在5分钟内有效。
-
-如果您没有请求重置密码，请忽略此邮件。
-
-谢谢，
-${appName} 团队`;
-    } else {
-      return `${code} is your verification code
-
-Hello,
-
-You have requested to reset your password. Please use the code above to complete the password reset process.
-This verification code will be valid for 5 minutes.
-
-If you did not request a password reset, please ignore this email.
-
-Thank you,
-${appName} Team`;
-    }
-  }
-
-  /**
-   * 生成密码重置邮件的HTML内容
-   * 不使用i18n翻译，直接硬编码内容以确保正确显示
-   */
-  private generateResetPasswordHtml(
-    code: string,
-    lang: string,
-    appName: string,
-  ): string {
-    if (lang === 'zh') {
-      return `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <h2 style="color: #333;">密码重置</h2>
-          <p><strong>${code} 是你的验证码</strong></p>
-          <p>您好，</p>
-          <p>您正在请求重置密码。请使用上面的验证码完成密码重置流程：</p>
-          <div style="background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;">
-            ${code}
-          </div>
-          <p>此验证码将在5分钟内有效。</p>
-          <p>如果您没有请求重置密码，请忽略此邮件。</p>
-          <p>谢谢，</p>
-          <p>${appName} 团队</p>
-        </div>
-      `;
-    } else {
-      return `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <h2 style="color: #333;">Password Reset</h2>
-          <p><strong>${code} is your verification code</strong></p>
-          <p>Hello,</p>
-          <p>You have requested to reset your password. Please use the code above to complete the password reset process:</p>
-          <div style="background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0;">
-            ${code}
-          </div>
-          <p>This verification code will be valid for 5 minutes.</p>
-          <p>If you did not request a password reset, please ignore this email.</p>
-          <p>Thank you,</p>
-          <p>${appName} Team</p>
-        </div>
-      `;
-    }
-  }
-
-  /**
-   * 翻译指定的键值
-   * 使用项目的i18n服务，如果不可用则返回键名
-   */
   private translate(
     key: string,
     lang: string,
     args: Record<string, any> = {},
   ): string {
-    if (!this.i18n) {
-      return key;
+    try {
+      if (this.i18n) {
+        return this.i18n.translate(key, { lang, args }) || key;
+      }
+    } catch (err) {
+      this.logger.warn(`翻译失败: ${key}, ${lang}`, err);
     }
 
-    try {
-      return this.i18n.translate(key, { lang, args });
-    } catch {
-      return key;
-    }
+    // 默认情况下返回键名
+    return key;
   }
 }

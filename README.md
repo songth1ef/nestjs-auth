@@ -9,6 +9,7 @@
 - **完整的认证流程**：用户注册、登录、令牌刷新
 - **安全防护**：JWT加密、密码哈希、速率限制
 - **密钥管理**：自动密钥轮换系统
+- **验证码服务**：支持邮箱验证码、密码重置流程
 - **API管理**：支持RESTful API、Swagger文档
 - **国际化**：支持多语言
 - **响应式前端**：简洁直观的用户界面
@@ -51,16 +52,18 @@ Swagger文档: http://localhost:8101/api/docs
 注册页面: http://localhost:8101/register
 ```
 
-## 最新更新 (v0.2.0)
+## 最新更新 (v0.6.0)
 
-- 实现API路径前缀配置 (/api)
-- 完成基础前端页面（登录、注册、语言设置）
-- 支持国际化（中/英文）
-- 优化认证流程和表单验证
+- 实现邮箱验证码服务 (VerificationService)
+- 添加邮件模板系统 (EmailTemplateService)
+- 完善错误码体系和统一响应格式
+- 支持密码重置功能
+- 优化邮件发送服务
+- 增强应用异常处理机制
 
 ## 详细文档
 
-详细的文档和功能清单请查看 [auth/README.md](auth/README.md)
+详细的文档和功能清单请查看 [auth/README.md](auth/README.md)，完整的更新日志请参考 [CHANGELOG.md](auth/CHANGELOG.md)。
 
 ## 许可证
 

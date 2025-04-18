@@ -461,10 +461,13 @@ nest g service service-name
 
 系统更新日志已移至 [CHANGELOG.md](./CHANGELOG.md) 文件，请查看该文件了解详细的版本更新内容。
 
-当前最新版本：v0.5.0
-- 全面增强系统国际化
-- 改进电子邮件模块
-- 代码质量提升
+当前最新版本：v0.6.0
+- 实现邮箱验证码服务 (VerificationService)
+- 添加邮件模板系统 (EmailTemplateService)
+- 完善错误码体系和统一响应格式
+- 支持密码重置功能
+- 优化邮件发送服务
+- 增强应用异常处理机制
 
 ## Swagger 集成指南
 
