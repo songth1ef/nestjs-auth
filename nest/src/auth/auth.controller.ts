@@ -99,11 +99,15 @@ export class AuthController {
       );
     }
 
-    // 生成6位数字验证码
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // 生成6位大写字母和数字的组合验证码
+    const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 排除容易混淆的字符如0,1,I,O
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
 
-    // 将验证码存储在缓存中，有效期10分钟
-    await this.cacheManager.set(`verification_code:${email}`, code, 600000);
+    // 将验证码存储在缓存中，有效期5分钟
+    await this.cacheManager.set(`verification_code:${email}`, code, 300000);
 
     // 发送验证码
     const success = await this.emailService.sendVerificationCode(email, code);

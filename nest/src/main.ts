@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import { join } from 'path';
-import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { ResponseInterceptor } from './common/interceptors/i18n-response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { HttpAdapterHost } from '@nestjs/core';
@@ -15,11 +15,13 @@ import {
   ErrorResponseDto,
 } from './common/dto/response.dto';
 import { Request, Response, NextFunction } from 'express';
+import { I18nService } from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const httpAdapterHost = app.get(HttpAdapterHost);
+  const i18nService = app.get<I18nService>(I18nService);
 
   // 设置全局API前缀
   app.setGlobalPrefix('api', {
@@ -51,8 +53,8 @@ async function bootstrap() {
     }),
   );
 
-  // 全局响应拦截器
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  // 全局响应拦截器 - 使用带I18n支持的拦截器
+  app.useGlobalInterceptors(new ResponseInterceptor(i18nService as any));
 
   // 全局异常过滤器
   app.useGlobalFilters(

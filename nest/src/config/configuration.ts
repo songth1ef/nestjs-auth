@@ -1,5 +1,11 @@
 export default () => ({
   port: parseInt(process.env.PORT || '8101', 10),
+  app: {
+    name: process.env.APP_NAME || '友定开放平台',
+    fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'zh',
+    nodeEnv: process.env.NODE_ENV || 'development',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:8102',
+  },
   database: {
     type: process.env.DB_TYPE || 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -13,7 +19,7 @@ export default () => ({
     encryption: process.env.DB_ENCRYPTION === 'true',
   },
   jwt: {
-    symmetricEncryption: process.env.JWT_SYMMETRIC_ENCRYPTION !== 'true',
+    symmetricEncryption: process.env.JWT_SYMMETRIC_ENCRYPTION === 'true',
     secret: process.env.JWT_SECRET_KEY || 'dev_jwt_secret_key',
     publicKey: process.env.JWT_PUBLIC_KEY || './keys/public.key',
     privateKey: process.env.JWT_PRIVATE_KEY || './keys/private.key',
@@ -33,10 +39,77 @@ export default () => ({
     passwordRequireSymbols: process.env.PASSWORD_REQUIRE_SYMBOLS === 'true',
     maxLoginAttempts: parseInt(process.env.MAX_LOGIN_ATTEMPTS || '5', 10),
     loginLockoutTime: process.env.LOGIN_LOCKOUT_TIME || '15m',
+    enable2FA: process.env.ENABLE_2FA === 'true',
+    passwordMaxAgeDays: parseInt(process.env.PASSWORD_MAX_AGE_DAYS || '90', 10),
+    passwordHistoryCount: parseInt(
+      process.env.PASSWORD_HISTORY_COUNT || '5',
+      10,
+    ),
+    accountIdleLockDays: parseInt(
+      process.env.ACCOUNT_IDLE_LOCK_DAYS || '90',
+      10,
+    ),
   },
   cors: {
-    origins: process.env.CORS_ORIGINS 
-      ? process.env.CORS_ORIGINS.split(',') 
+    origins: process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(',')
       : ['http://localhost:3000'],
   },
-}); 
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || '',
+    db: parseInt(process.env.REDIS_DB || '0', 10),
+    ttl: parseInt(process.env.REDIS_TTL || '600', 10),
+    maxItems: parseInt(process.env.REDIS_MAX_ITEMS || '100000', 10),
+    tls: process.env.REDIS_TLS === 'true',
+    sentinelEnabled: process.env.REDIS_SENTINEL_ENABLED === 'true',
+    clusterEnabled: process.env.REDIS_CLUSTER_ENABLED === 'true',
+    clusterNodes: process.env.REDIS_CLUSTER_NODES || 'localhost:6379',
+    clusterMaxRedirections: parseInt(
+      process.env.REDIS_CLUSTER_MAX_REDIRECTIONS || '16',
+      10,
+    ),
+    clusterScaleReads: process.env.REDIS_CLUSTER_SCALE_READS || 'all',
+  },
+  email: {
+    host: process.env.SMTP_HOST || '',
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.SMTP_FROM || '',
+    fromName: process.env.SMTP_FROM_NAME || '认证系统',
+    templatesDir: process.env.EMAIL_TEMPLATES_DIR || './templates/email',
+  },
+  swagger: {
+    enabled: process.env.SWAGGER_ENABLED === 'true',
+    title: process.env.SWAGGER_TITLE || 'NestJS Auth API',
+    description: process.env.SWAGGER_DESCRIPTION || '认证系统 API 文档',
+    version: process.env.SWAGGER_VERSION || '1.0',
+    path: process.env.SWAGGER_PATH || 'api/docs',
+  },
+  session: {
+    secret: process.env.SESSION_SECRET || 'session_secret',
+    expiry: process.env.SESSION_EXPIRY || '30m',
+    secure: process.env.SESSION_SECURE === 'true',
+    httpOnly: process.env.SESSION_HTTP_ONLY === 'true',
+    sameSite: process.env.SESSION_SAME_SITE || 'lax',
+    cookiePath: process.env.SESSION_COOKIE_PATH || '/',
+    domain: process.env.SESSION_DOMAIN || 'localhost',
+  },
+  oauth: {
+    google: {
+      enabled: process.env.OAUTH_GOOGLE_ENABLED === 'true',
+      clientId: process.env.OAUTH_GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.OAUTH_GOOGLE_CLIENT_SECRET || '',
+      callbackUrl: process.env.OAUTH_GOOGLE_CALLBACK_URL || '',
+    },
+    github: {
+      enabled: process.env.OAUTH_GITHUB_ENABLED === 'true',
+      clientId: process.env.OAUTH_GITHUB_CLIENT_ID || '',
+      clientSecret: process.env.OAUTH_GITHUB_CLIENT_SECRET || '',
+      callbackUrl: process.env.OAUTH_GITHUB_CALLBACK_URL || '',
+    },
+  },
+});
