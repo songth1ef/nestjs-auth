@@ -1,25 +1,32 @@
-# NestJS 认证系统
+# NestJS Auth 认证系统
 
 ## 项目概述
 
 一个基于 NestJS 框架构建的完整认证系统，提供高安全性、高性能的身份认证和授权服务。可作为独立的认证中心，也可以集成到其他应用中使用。
 
-## 核心特性
+## 核心功能
 
-- **完整的认证流程**：用户注册、登录、令牌刷新
-- **安全防护**：JWT加密、密码哈希、速率限制
-- **密钥管理**：自动密钥轮换系统
-- **验证码服务**：支持邮箱验证码、密码重置流程
-- **API管理**：支持RESTful API、Swagger文档
-- **国际化**：支持多语言
-- **响应式前端**：简洁直观的用户界面
+- 🔐 用户注册/登录/退出
+- 📧 邮箱验证码 与 邮件模板系统
+- 🌍 完善的国际化支持 (i18n)
+- 🔑 JWT 认证与授权
+- 👮 基于角色的访问控制 (RBAC)
+- 📱 2FA 双因素认证
+- 🔄 刷新令牌机制
+- 📊 用户管理与数据分析
+- 🚫 错误处理与拦截
+- 📝 操作日志记录
 
 ## 技术栈
 
-- **后端**：NestJS, TypeScript, PostgreSQL, TypeORM, Redis
-- **前端**：HTML, CSS, JavaScript
-- **安全**：JWT, Bcrypt, Helmet
-- **文档**：Swagger/OpenAPI
+- **后端**: NestJS, TypeORM, PostgreSQL
+- **前端**: Next.js, Tailwind CSS, ShadcnUI
+- **认证**: JWT, Passport.js
+- **缓存**: Redis
+- **国际化**: i18n
+- **邮件服务**: Nodemailer
+- **双因素认证**: Speakeasy
+- **部署**: Docker, Docker Compose
 
 ## 快速开始
 
@@ -29,20 +36,13 @@ git clone https://github.com/songth1ef/nestjs-auth.git
 cd nestjs-auth/auth
 ```
 
-2. 安装依赖
-```bash
-npm install
-```
-
-3. 配置环境变量
+2. 配置环境变量
 ```bash
 cp .env.example .env
 ```
 
-4. 启动开发服务器
-```bash
-npm run start:dev
-```
+3. 安装依赖：`yarn install`
+4. 启动开发服务器：`yarn start:dev`
 
 5. 访问应用
 ```
@@ -52,14 +52,20 @@ Swagger文档: http://localhost:8101/api/docs
 注册页面: http://localhost:8101/register
 ```
 
-## 最新更新 (v0.6.0)
+## 最新更新
 
-- 实现邮箱验证码服务 (VerificationService)
-- 添加邮件模板系统 (EmailTemplateService)
-- 完善错误码体系和统一响应格式
-- 支持密码重置功能
-- 优化邮件发送服务
-- 增强应用异常处理机制
+### v0.7.0 - 统一响应格式与国际化完善
+- 完善响应数据结构，支持前端数据格式需求
+- 修复国际化消息问题，保证多语言环境下正确显示信息
+- 增强i18n响应拦截器，支持用户语言偏好设置
+- 优化分页数据处理机制，提高数据一致性
+- 类型定义增强，提升系统健壮性
+
+### v0.6.0 - 邮箱验证服务
+- 实现邮箱验证码服务(VerificationService)
+- 建立邮件模板系统，支持多语言
+- 完善错误码系统和异常处理机制
+- 优化缓存键管理和邮件发送服务
 
 ## 详细文档
 
