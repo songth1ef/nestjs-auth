@@ -1,0 +1,37 @@
+{
+  "client": {
+    "create": {
+      "success": "OAuth client created successfully",
+      "failed": "Failed to create OAuth client"
+    },
+    "update": {
+      "success": "OAuth client updated successfully",
+      "failed": "Failed to update OAuth client"
+    },
+    "delete": {
+      "success": "OAuth client deleted successfully",
+      "failed": "Failed to delete OAuth client"
+    },
+    "notFound": "OAuth client not found",
+    "exists": "Client name already exists",
+    "inactive": "Client is inactive",
+    "invalidSecret": "Invalid client secret"
+  },
+  "auth": {
+    "authorize": {
+      "success": "Authorization successful",
+      "failed": "Authorization failed",
+      "invalidRedirect": "Invalid redirect URI"
+    },
+    "token": {
+      "success": "Token exchange successful",
+      "failed": "Token exchange failed",
+      "invalidGrant": "Invalid grant type",
+      "invalidCode": "Authorization code is invalid or expired",
+      "invalidClient": "Invalid client credentials",
+      "missingCode": "Missing authorization code",
+      "missingRefreshToken": "Missing refresh token",
+      "mismatchRedirect": "Redirect URI mismatch"
+    }
+  }
+} 

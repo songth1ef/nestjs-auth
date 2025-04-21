@@ -17,6 +17,7 @@ import {
   QueryResolver,
   HeaderResolver,
 } from 'nestjs-i18n';
+import { OAuthModule } from './oauth/oauth.module';
 
 // Redis缓存配置接口
 interface RedisConfig {
@@ -147,6 +148,7 @@ interface RedisConfig {
     UsersModule,
     AuthModule,
     EmailModule,
+    OAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

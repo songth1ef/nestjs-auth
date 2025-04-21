@@ -1,0 +1,37 @@
+{
+  "client": {
+    "create": {
+      "success": "OAuth客户端创建成功",
+      "failed": "OAuth客户端创建失败"
+    },
+    "update": {
+      "success": "OAuth客户端更新成功",
+      "failed": "OAuth客户端更新失败"
+    },
+    "delete": {
+      "success": "OAuth客户端删除成功",
+      "failed": "OAuth客户端删除失败"
+    },
+    "notFound": "未找到指定的OAuth客户端",
+    "exists": "客户端名称已存在",
+    "inactive": "客户端已被禁用",
+    "invalidSecret": "客户端密钥无效"
+  },
+  "auth": {
+    "authorize": {
+      "success": "授权成功",
+      "failed": "授权失败",
+      "invalidRedirect": "无效的重定向URI"
+    },
+    "token": {
+      "success": "令牌交换成功",
+      "failed": "令牌交换失败",
+      "invalidGrant": "无效的授权类型",
+      "invalidCode": "授权码无效或已过期",
+      "invalidClient": "客户端凭据无效",
+      "missingCode": "缺少授权码",
+      "missingRefreshToken": "缺少刷新令牌",
+      "mismatchRedirect": "重定向URI不匹配"
+    }
+  }
+} 

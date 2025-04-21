@@ -10,6 +10,14 @@ interface JwtPayload {
   username: string;
   sub: string;
   roles: string[];
+  client_id?: string;
+}
+
+interface ClientOptions {
+  clientId?: string;
+  clientSecret?: string;
+  redirectUri?: string;
+  scope?: string;
 }
 
 @Injectable()
@@ -24,13 +32,13 @@ export class AuthService {
   ) {}
 
   async validateUser(
-    identifier: string, 
-    password: string, 
-    isEmail = false
+    identifier: string,
+    password: string,
+    isEmail = false,
   ): Promise<User> {
     try {
       let user: User;
-      
+
       if (isEmail) {
         user = await this.usersService.findByEmail(identifier);
       } else {
@@ -63,13 +71,17 @@ export class AuthService {
     }
   }
 
-  async login(user: User) {
+  async login(user: User, clientOptions?: ClientOptions) {
     try {
       const payload: JwtPayload = {
         username: user.username,
         sub: user.id,
         roles: user.roles,
       };
+
+      if (clientOptions?.clientId) {
+        payload.client_id = clientOptions.clientId;
+      }
 
       const isSymmetric = this.configService.get<boolean>(
         'jwt.symmetricEncryption',
@@ -78,7 +90,9 @@ export class AuthService {
         ? this.keyService.getSymmetricKey()
         : this.keyService.getPrivateKey();
 
-      const algorithm = this.configService.get<Algorithm>('jwt.algorithm') || 'HS256';
+      const algorithm =
+        this.configService.get<Algorithm>('jwt.algorithm') || 'HS256';
+
       const signOptions: SignOptions = {
         expiresIn: this.configService.get<string>('jwt.expiresIn'),
         algorithm,
@@ -96,16 +110,50 @@ export class AuthService {
         }),
       ]);
 
-      return {
+      const response = {
         access_token: accessToken,
         refresh_token: refreshToken,
         preferred_language: user.preferredLanguage,
       };
+
+      if (clientOptions?.clientId) {
+        const expiresIn =
+          this.configService.get<string>('jwt.expiresIn') || '1h';
+
+        Object.assign(response, {
+          token_type: 'Bearer',
+          expires_in: this.parseExpiresIn(expiresIn),
+          scope: clientOptions.scope || '',
+        });
+      }
+
+      return response;
     } catch (error: unknown) {
       if (error instanceof Error) {
         this.logger.error(`登录失败: ${error.message}`, error.stack);
       }
       throw error;
+    }
+  }
+
+  private parseExpiresIn(expiresIn: string): number {
+    const match = expiresIn.match(/^(\d+)([smhd])$/);
+    if (!match) return 3600;
+
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
+
+    switch (unit) {
+      case 's':
+        return value;
+      case 'm':
+        return value * 60;
+      case 'h':
+        return value * 60 * 60;
+      case 'd':
+        return value * 24 * 60 * 60;
+      default:
+        return 3600;
     }
   }
 
@@ -118,7 +166,8 @@ export class AuthService {
         ? this.keyService.getSymmetricKey()
         : this.keyService.getPublicKey();
 
-      const algorithm = this.configService.get<Algorithm>('jwt.algorithm') || 'HS256';
+      const algorithm =
+        this.configService.get<Algorithm>('jwt.algorithm') || 'HS256';
 
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret: secretOrKey,
@@ -138,4 +187,4 @@ export class AuthService {
       throw new UnauthorizedException('无效的刷新令牌');
     }
   }
-} 
+}

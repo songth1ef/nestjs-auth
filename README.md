@@ -16,12 +16,13 @@
 - 📊 用户管理与数据分析
 - 🚫 错误处理与拦截
 - 📝 操作日志记录
+- 🔌 OAuth 2.0 客户端注册与授权
 
 ## 技术栈
 
 - **后端**: NestJS, TypeORM, PostgreSQL
 - **前端**: Next.js, Tailwind CSS, ShadcnUI
-- **认证**: JWT, Passport.js
+- **认证**: JWT, Passport.js, OAuth 2.0
 - **缓存**: Redis
 - **国际化**: i18n
 - **邮件服务**: Nodemailer
@@ -53,6 +54,14 @@ Swagger文档: http://localhost:8101/api/docs
 ```
 
 ## 最新更新
+
+### v0.8.0 - OAuth客户端注册与授权
+- 添加OAuth客户端管理功能
+- 实现授权码模式认证流程
+- 登录接口支持客户端密钥验证
+- 支持code exchange获取token机制
+- 拓展JWT payload以包含客户端标识
+- 添加OAuth国际化支持
 
 ### v0.7.0 - 统一响应格式与国际化完善
 - 完善响应数据结构，支持前端数据格式需求

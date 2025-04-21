@@ -73,6 +73,19 @@ export class AuthController {
       isEmail,
     );
 
+    // 检查是否有客户端凭据
+    if (loginDto.client_id) {
+      // 注意：这里需要添加OAuthClientService的依赖，但这里仅做示例
+      // 实际项目中应该注入OAuthClientService并验证客户端凭据
+      return this.authService.login(user, {
+        clientId: loginDto.client_id,
+        clientSecret: loginDto.client_secret,
+        redirectUri: loginDto.redirect_uri,
+        scope: loginDto.scope,
+      });
+    }
+
+    // 标准登录
     return this.authService.login(user);
   }
 
@@ -93,7 +106,7 @@ export class AuthController {
   async forgotPassword(@Body('email') email: string, @Req() req: Request) {
     if (!email) {
       throw new BadRequestException(
-        await this.i18n.translate('auth.password.forgot.emailRequired', {
+        this.i18n.translate('auth.password.forgot.emailRequired', {
           lang: req.headers['accept-language'] || 'zh',
         }),
       );
@@ -115,19 +128,16 @@ export class AuthController {
     if (success) {
       return {
         success: true,
-        message: await this.i18n.translate('auth.password.forgot.codeSent', {
+        message: this.i18n.translate('auth.password.forgot.codeSent', {
           lang: req.headers['accept-language'] || 'zh',
         }),
       };
     } else {
       return {
         success: false,
-        message: await this.i18n.translate(
-          'auth.password.forgot.codeSendFailed',
-          {
-            lang: req.headers['accept-language'] || 'zh',
-          },
-        ),
+        message: this.i18n.translate('auth.password.forgot.codeSendFailed', {
+          lang: req.headers['accept-language'] || 'zh',
+        }),
       };
     }
   }
@@ -144,7 +154,7 @@ export class AuthController {
 
     if (!email || !code || !newPassword) {
       throw new BadRequestException(
-        await this.i18n.translate('auth.password.reset.fieldsRequired', {
+        this.i18n.translate('auth.password.reset.fieldsRequired', {
           lang,
         }),
       );
@@ -158,7 +168,7 @@ export class AuthController {
     if (!storedCode) {
       return {
         success: false,
-        message: await this.i18n.translate('auth.password.reset.codeExpired', {
+        message: this.i18n.translate('auth.password.reset.codeExpired', {
           lang,
         }),
       };
@@ -167,7 +177,7 @@ export class AuthController {
     if (storedCode !== code) {
       return {
         success: false,
-        message: await this.i18n.translate('auth.password.reset.codeInvalid', {
+        message: this.i18n.translate('auth.password.reset.codeInvalid', {
           lang,
         }),
       };
@@ -182,14 +192,14 @@ export class AuthController {
 
       return {
         success: true,
-        message: await this.i18n.translate('auth.password.reset.success', {
+        message: this.i18n.translate('auth.password.reset.success', {
           lang,
         }),
       };
     } catch (error) {
       return {
         success: false,
-        message: await this.i18n.translate('auth.password.reset.failed', {
+        message: this.i18n.translate('auth.password.reset.failed', {
           lang,
           args: {
             message: error instanceof Error ? error.message : String(error),

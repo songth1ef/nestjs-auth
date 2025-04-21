@@ -200,7 +200,7 @@ AUDIT_LOG_ENABLED=true  # 审计日志
    - [x] 自动会话续期
 
 2. **多种登录方式**：
-   - [ ] OAuth 2.0 社交登录 (Google, GitHub, Facebook)
+   - [x] OAuth 2.0 社交登录 (Google, GitHub, Facebook)
    - [ ] SAML/SSO 集成
    - [ ] 企业 LDAP/AD 集成
    - [ ] 生物识别认证接口
@@ -311,7 +311,7 @@ AUDIT_LOG_ENABLED=true  # 审计日志
    - [x] 刷新令牌机制
    - [x] 会话管理
    - [x] API 密钥轮换
-   - [ ] OAuth 2.1 支持
+   - [x] OAuth 2.1 支持
    - [x] JWT 签名验证 API
 
 2. **用户管理 API**：
@@ -461,13 +461,13 @@ nest g service service-name
 
 系统更新日志已移至 [CHANGELOG.md](./CHANGELOG.md) 文件，请查看该文件了解详细的版本更新内容。
 
-当前最新版本：v0.6.0
-- 实现邮箱验证码服务 (VerificationService)
-- 添加邮件模板系统 (EmailTemplateService)
-- 完善错误码体系和统一响应格式
-- 支持密码重置功能
-- 优化邮件发送服务
-- 增强应用异常处理机制
+当前最新版本：v0.8.1
+- 实现OAuth客户端注册与授权流程
+- 支持授权码授权机制与令牌交换
+- 与标准登录流程集成，拓展JWT payload
+- 修复OAuth模块依赖问题
+- 优化错误处理机制，提高类型安全性
+- 改进错误日志记录格式
 
 ## Swagger 集成指南
 
@@ -581,3 +581,109 @@ SwaggerModule.setup("api/v1/docs", app, v1Document);
 ## 许可证
 
 MIT
+
+# OAuth客户端注册与授权流程
+
+本系统现已支持OAuth 2.0客户端注册和授权，使客户端应用能够通过标准的OAuth流程获取用户授权和访问令牌。
+
+## 客户端注册
+
+管理员可以通过以下API创建OAuth客户端：
+
+```
+POST /oauth/clients
+```
+
+请求示例：
+```json
+{
+  "name": "前端App",
+  "description": "用于前端应用的OAuth客户端",
+  "redirectUris": ["https://example.com/callback"],
+  "scopes": ["read", "write"]
+}
+```
+
+成功创建后，系统将返回包含clientId和clientSecret的响应：
+```json
+{
+  "id": "5f9c8d7e6b5a4c3b2a1098f7",
+  "name": "前端App",
+  "clientId": "abc123def456",
+  "clientSecret": "xyz789ghi101112",
+  "redirectUris": ["https://example.com/callback"],
+  "scopes": ["read", "write"],
+  "isActive": true,
+  "createdAt": "2023-05-01T08:00:00.000Z",
+  "updatedAt": "2023-05-01T08:00:00.000Z"
+}
+```
+
+## 使用客户端登录
+
+现在，您可以在用户登录时提供客户端凭据，以便系统生成适用于OAuth的令牌：
+
+```
+POST /auth/login
+```
+
+请求示例：
+```json
+{
+  "username": "admin",
+  "password": "admin123",
+  "client_id": "abc123def456",
+  "client_secret": "xyz789ghi101112",
+  "redirect_uri": "https://example.com/callback",
+  "scope": "read write"
+}
+```
+
+响应示例：
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "preferred_language": "zh",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "read write"
+}
+```
+
+## 授权码流程
+
+标准的OAuth授权码流程也已支持：
+
+1. 重定向用户到授权页面：
+   ```
+   GET /oauth/authorize?client_id=abc123def456&redirect_uri=https://example.com/callback&scope=read%20write
+   ```
+
+2. 用户登录并授权后，系统将重定向到指定的回调URL，并附加授权码：
+   ```
+   https://example.com/callback?code=def456ghi789&state=yourStateValue
+   ```
+
+3. 使用授权码交换令牌：
+   ```
+   POST /oauth/token
+   
+   {
+     "grant_type": "authorization_code",
+     "client_id": "abc123def456",
+     "client_secret": "xyz789ghi101112",
+     "code": "def456ghi789",
+     "redirect_uri": "https://example.com/callback"
+   }
+   ```
+
+## 集成至客户端应用
+
+在客户端应用中，可以通过以下步骤集成OAuth认证：
+
+1. 使用注册的客户端ID和密钥
+2. 实现授权重定向和回调处理
+3. 使用获取的令牌访问受保护的API资源
+
+完整的API文档和使用示例请参考Swagger文档：`/api/docs`
