@@ -30,15 +30,25 @@ export class CreateClientDto {
     example: [
       'https://example.com/callback',
       'https://staging.example.com/callback',
+      'http://localhost:8000/callback',
     ],
     description: '重定向URI列表',
     required: false,
     type: [String],
   })
   @IsArray()
-  @IsUrl({}, { each: true })
+  @IsUrl(
+    {
+      require_tld: false, // 允许没有顶级域名的URL (如localhost)
+      require_protocol: true, // 要求URL必须有协议部分
+    },
+    { each: true },
+  )
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : value?.split(',')))
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value as string[];
+    return typeof value === 'string' ? value.split(',') : [];
+  })
   redirectUris?: string[];
 
   @ApiProperty({
@@ -51,7 +61,10 @@ export class CreateClientDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : value?.split(',')))
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value as string[];
+    return typeof value === 'string' && value ? value.split(',') : [];
+  })
   allowedGrantTypes?: string[];
 
   @ApiProperty({
@@ -63,7 +76,10 @@ export class CreateClientDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : value?.split(',')))
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value as string[];
+    return typeof value === 'string' && value ? value.split(',') : [];
+  })
   scopes?: string[];
 
   @ApiProperty({
@@ -74,7 +90,9 @@ export class CreateClientDto {
   })
   @IsBoolean()
   @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
+  @Transform(({ value }) => {
+    return value === 'true' || value === true;
+  })
   isActive?: boolean;
 
   @ApiProperty({

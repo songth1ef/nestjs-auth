@@ -24,4 +24,7 @@ export const API_ENDPOINTS = {
     updateProfile: '/api/users/profile',
     changePassword: '/api/users/change-password',
   },
+  oauth: {
+    clients: '/api/oauth/clients',
+  },
 } 

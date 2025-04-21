@@ -1,6 +1,28 @@
 import { API_CONFIG, API_ENDPOINTS } from './config'
 import { handleResponse, handleError } from './utils'
 
+// 定义OAuth客户端接口
+export interface OAuthClient {
+  id: string
+  name: string
+  description?: string
+  clientId: string
+  clientSecret: string
+  redirectUris: string[]
+  scopes: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+// 创建OAuth客户端DTO
+export interface CreateClientDto {
+  name: string
+  description?: string
+  redirectUris: string[]
+  scopes: string[]
+}
+
 class ApiClient {
   private baseURL: string
   private headers: HeadersInit
@@ -136,6 +158,61 @@ class ApiClient {
     return this.request(API_ENDPOINTS.user.changePassword, {
       method: 'POST',
       body: JSON.stringify(data),
+    })
+  }
+  
+  // OAuth API
+  async getOAuthClients(): Promise<OAuthClient[]> {
+    return this.request(API_ENDPOINTS.oauth.clients, {
+      method: 'GET',
+    })
+  }
+  
+  async getOAuthClient(id: string): Promise<OAuthClient> {
+    return this.request(`${API_ENDPOINTS.oauth.clients}/${id}`, {
+      method: 'GET',
+    })
+  }
+  
+  async createOAuthClient(data: CreateClientDto): Promise<OAuthClient> {
+    // 确保所有重定向URI都是符合规范的URL格式
+    const formattedData = {
+      ...data,
+      redirectUris: data.redirectUris.map(uri => {
+        // 确保URL格式正确
+        try {
+          // 尝试解析URL
+          const url = new URL(uri);
+          
+          // 确保URL包含协议、主机名和路径 (可能的NestJS验证要求)
+          if (!url.protocol || !url.hostname) {
+            throw new Error(`Invalid URL: ${uri}`);
+          }
+          
+          // 确保URI不包含片段标识符(fragment)
+          if (url.hash) {
+            const uriWithoutFragment = uri.split('#')[0];
+            console.log(`移除URL中的片段标识符: ${uri} -> ${uriWithoutFragment}`);
+            return uriWithoutFragment;
+          }
+          
+          return uri;
+        } catch (error) {
+          console.error(`无效的重定向URI: ${uri}`, error);
+          throw new Error(`无效的重定向URI: ${uri}，必须是完整的URL地址，包含协议和主机名`);
+        }
+      })
+    };
+    
+    return this.request(API_ENDPOINTS.oauth.clients, {
+      method: 'POST',
+      body: JSON.stringify(formattedData),
+    });
+  }
+  
+  async deleteOAuthClient(id: string): Promise<void> {
+    return this.request(`${API_ENDPOINTS.oauth.clients}/${id}`, {
+      method: 'DELETE',
     })
   }
 }

@@ -38,6 +38,12 @@ export default function Dashboard() {
               >
                 用户管理
               </Link>
+              <Link
+                href="/dashboard/oauth-clients"
+                className="px-4 py-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700"
+              >
+                OAuth客户端
+              </Link>
               <button
                 onClick={() => {
                   localStorage.removeItem("auth");
