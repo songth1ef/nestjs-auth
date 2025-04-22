@@ -4,37 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { apiClient } from '@/lib/api/client';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  roles: string[];
-  isActive: boolean;
-  createdAt: string;
-  lastLoginDate: string;
-}
-
-interface PageMeta {
-  page: number;
-  limit: number;
-  totalItems: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
-
-interface ApiResponse {
-  code: number;
-  data: {
-    data: User[];
-    meta: PageMeta;
-  };
-  message: string;
-  success: boolean;
-  timestamp: number;
-}
+import { apiClient, User, PageMeta } from '@/lib/api/client';
 
 interface ApiError {
   code: number;
@@ -59,7 +29,7 @@ export default function UsersPage() {
     if (!loading && page !== 1) {
       setPage(1);
     }
-  }, [limit, search, loading, page]); // 添加missing dependencies
+  }, [limit, search, loading, page]);
 
   // 将 fetchUsers 用 useCallback 包装，避免无限循环
   const fetchUsers = useCallback(async () => {
@@ -70,18 +40,12 @@ export default function UsersPage() {
       const response = await apiClient.getUsers({
         page,
         limit,
-        search: search || undefined,
-      }) as ApiResponse;
+        search: search.trim() || undefined,
+      });
       
-      if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        setUsers(response.data.data);
-        if (response.data.meta) {
-          setMeta(response.data.meta);
-        }
-      } else {
-        console.error('Unexpected response format:', response);
-        setError('获取用户数据格式错误');
-      }
+      // 提取用户数据和分页元数据
+      setUsers(response.data);
+      setMeta(response.meta);
     } catch (error) {
       console.error('获取用户列表失败:', error);
       
@@ -95,7 +59,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, search]); // 添加fetchUsers依赖项
+  }, [page, limit, search]);
 
   useEffect(() => {
     // 验证用户是否已登录

@@ -8,15 +8,19 @@ import Link from 'next/link'
 
 // 定义登录响应类型
 interface LoginResponse {
-  code: number;
-  data: {
+  code?: number;
+  data?: {
     access_token: string;
     refresh_token: string;
     preferred_language?: string;
   };
-  message: string;
-  success: boolean;
-  timestamp: number;
+  message?: string;
+  success?: boolean;
+  timestamp?: number;
+  // 直接返回令牌的情况
+  access_token?: string;
+  refresh_token?: string;
+  preferred_language?: string;
 }
 
 export default function LoginPage() {
@@ -44,23 +48,37 @@ export default function LoginPage() {
         : { username: identifier, password }
       
       const response = await apiClient.login(loginData) as LoginResponse
+      
       // 登录成功后设置本地存储
       if (typeof window !== 'undefined') {
         localStorage.setItem('auth', 'true')
-        // 保存token到localStorage
+        
+        // 处理不同的响应结构
+        let accessToken = null;
+        
+        // 检查嵌套的data结构
         if (response.data && response.data.access_token) {
-          localStorage.setItem('token', response.data.access_token)
-          console.log('Token saved:', response.data.access_token)
+          accessToken = response.data.access_token;
+        } 
+        // 检查直接返回的token
+        else if (response.access_token) {
+          accessToken = response.access_token;
+        }
+        
+        if (accessToken) {
+          localStorage.setItem('token', accessToken);
+          console.log('Token saved:', accessToken);
+          router.push('/dashboard');
         } else {
-          console.error('No token received in response:', response)
+          console.error('No token received in response:', response);
+          setError(t('errors.noToken'));
         }
       }
-      router.push('/dashboard')
     } catch (err) {
-      console.error('Login error:', err)
-      setError(err instanceof Error ? err.message : t('errors.unknown'))
+      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : t('errors.unknown'));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 

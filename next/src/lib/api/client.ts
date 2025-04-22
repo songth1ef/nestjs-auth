@@ -23,6 +23,33 @@ export interface CreateClientDto {
   scopes: string[]
 }
 
+// 用户接口
+export interface User {
+  id: string
+  username: string
+  email: string
+  roles: string[]
+  isActive: boolean
+  createdAt: string
+  lastLoginDate?: string
+}
+
+// 分页元数据
+export interface PageMeta {
+  page: number
+  limit: number
+  totalItems: number
+  totalPages: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
+// 分页响应
+export interface PaginatedResponse<T> {
+  data: T[]
+  meta: PageMeta
+}
+
 class ApiClient {
   private baseURL: string
   private headers: HeadersInit
@@ -122,8 +149,8 @@ class ApiClient {
   async getUsers(params: { 
     page?: number; 
     limit?: number; 
-    search?: string 
-  }) {
+    search?: string | undefined; 
+  }): Promise<PaginatedResponse<User>> {
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
