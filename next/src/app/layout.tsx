@@ -11,14 +11,15 @@ export const metadata: Metadata = {
   description: "基于 Next.js 和 NestJS 的认证系统",
 };
 
-export default function RootLayout({
-  children,
-  params,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-  params: { locale?: string };
-}) {
-  const locale = params.locale || "zh";
+}
+
+// 由于Next.js 15.3.0改变了对params的处理方式，不再将其直接传递给layout组件
+export default function RootLayout({ children }: RootLayoutProps) {
+  // 在组件内部获取locale，而不是通过params参数获取
+  // 默认使用中文
+  const locale = "zh";
   
   return (
     <html lang={locale}>

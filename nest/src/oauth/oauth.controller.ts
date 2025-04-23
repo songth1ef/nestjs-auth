@@ -81,7 +81,9 @@ export class OAuthController {
   @ApiResponse({ status: 200, description: '令牌交换成功' })
   @ApiResponse({ status: 400, description: '请求参数错误' })
   @ApiResponse({ status: 401, description: '客户端凭据无效' })
-  async token(@Body() tokenRequest: TokenRequestDto): Promise<Record<string, any>> {
+  async token(
+    @Body() tokenRequest: TokenRequestDto,
+  ): Promise<Record<string, any>> {
     return this.oauthService.exchangeToken(tokenRequest);
   }
 }

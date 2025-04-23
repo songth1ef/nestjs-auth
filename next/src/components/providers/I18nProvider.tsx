@@ -22,7 +22,7 @@ export const I18nProvider = ({ locale, children, namespaces = ['common'] }: I18n
     if (!initialized) {
       i18n
         .use(initReactI18next)
-        .use(resourcesToBackend((language: string, namespace: string) => 
+        .use(resourcesToBackend((language: string, namespace: string) =>
           import(`@/i18n/locales/${language}/${namespace}.json`)))
         .init({
           ...getOptions(locale, namespaces),
@@ -32,7 +32,7 @@ export const I18nProvider = ({ locale, children, namespaces = ['common'] }: I18n
     } else {
       i18n.changeLanguage(locale)
     }
-  }, [locale])
+  }, [locale, namespaces])
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
 } 

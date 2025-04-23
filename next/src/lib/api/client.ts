@@ -50,6 +50,17 @@ export interface PaginatedResponse<T> {
   meta: PageMeta
 }
 
+// 登录响应
+export interface LoginResponse {
+  token: string
+  user: {
+    id: string
+    username: string
+    email: string
+    roles: string[]
+  }
+}
+
 class ApiClient {
   private baseURL: string
   private headers: HeadersInit
@@ -61,7 +72,13 @@ class ApiClient {
 
   private getAuthToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('token')
+      // 从localStorage获取token
+      const token = localStorage.getItem('token')
+      if (!token || token === 'undefined') {
+        console.warn('未找到有效的token或token为undefined')
+        return null
+      }
+      return token
     }
     return null
   }
@@ -81,6 +98,9 @@ class ApiClient {
     
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
+      console.log(`发送请求到 ${endpoint} 带有token: ${token.substring(0, 10)}...`)
+    } else {
+      console.log(`发送请求到 ${endpoint} 无token`)
     }
     
     const config: RequestInit = {
@@ -98,11 +118,40 @@ class ApiClient {
   }
 
   // Auth API
-  async login(data: { email?: string; username?: string; password: string }) {
-    return this.request(API_ENDPOINTS.auth.login, {
+  async login(data: { email?: string; username?: string; password: string }): Promise<LoginResponse> {
+    const response = await this.request<{
+      code: number,
+      data: {
+        access_token: string,
+        refresh_token: string,
+        preferred_language: string
+      },
+      message: string,
+      success: boolean,
+      timestamp: number
+    }>(API_ENDPOINTS.auth.login, {
       method: 'POST',
       body: JSON.stringify(data),
     })
+    
+    // 登录成功后直接存储token
+    if (response && response.data && response.data.access_token) {
+      localStorage.setItem('token', response.data.access_token)
+      localStorage.setItem('refresh_token', response.data.refresh_token)
+      localStorage.setItem('auth', 'true')
+      console.log('登录成功，已存储token')
+    }
+    
+    // 转换为预期的LoginResponse格式
+    return {
+      token: response.data.access_token,
+      user: {
+        id: '', // 接口没有返回用户信息，先留空
+        username: '',
+        email: '',
+        roles: []
+      }
+    }
   }
 
   async register(data: {
@@ -117,15 +166,28 @@ class ApiClient {
   }
 
   async logout() {
+    // 登出时清除token
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('auth')
+    }
+    
     return this.request(API_ENDPOINTS.auth.logout, {
       method: 'POST',
     })
   }
 
   async refreshToken() {
-    return this.request(API_ENDPOINTS.auth.refresh, {
+    const response = await this.request<{token: string}>(API_ENDPOINTS.auth.refresh, {
       method: 'POST',
     })
+    
+    // 刷新token成功后更新存储的token
+    if (response && response.token) {
+      localStorage.setItem('token', response.token)
+    }
+    
+    return response
   }
 
   async forgotPassword(email: string) {
@@ -190,9 +252,19 @@ class ApiClient {
   
   // OAuth API
   async getOAuthClients(): Promise<OAuthClient[]> {
-    return this.request(API_ENDPOINTS.oauth.clients, {
+    const response = await this.request<{ data: OAuthClient[] } | OAuthClient[]>(API_ENDPOINTS.oauth.clients, {
       method: 'GET',
     })
+    
+    // 确保返回数组类型
+    if (Array.isArray(response)) {
+      return response
+    } else if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+      return response.data
+    }
+    
+    console.error('OAuth客户端响应格式不正确:', response)
+    return []
   }
   
   async getOAuthClient(id: string): Promise<OAuthClient> {
