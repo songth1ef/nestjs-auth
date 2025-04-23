@@ -1,118 +1,463 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>语言偏好设置</title>
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #ddd;
+            --error-color: #f44336;
+            --success-color: #4CAF50;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px 0;
         }
+
         .container {
-            background-color: white;
-            padding: 30px;
+            background-color: var(--card-bg);
+            padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
+            position: relative;
         }
+
         h1 {
-            color: #333;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem;
         }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
+
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
+            color: var(--light-text);
             font-weight: bold;
-            color: #555;
         }
-        select {
+
+        select, input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            font-size: 16px;
+            font-size: 1rem;
         }
-        .btn {
-            background-color: #4CAF50;
+
+        .search-box {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            color: var(--light-text);
+        }
+
+        .language-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .language-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .language-option:hover {
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        .language-option.selected {
+            background-color: rgba(76, 175, 80, 0.2);
+            font-weight: bold;
+        }
+
+        .language-option:last-child {
+            border-bottom: none;
+        }
+
+        .current-lang {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 20px;
             border-radius: 4px;
             cursor: pointer;
-            width: 100%;
-            font-size: 16px;
+            font-size: 1rem;
             transition: background-color 0.3s;
         }
-        .btn:hover {
-            background-color: #45a049;
+
+        button:hover {
+            background-color: var(--primary-hover);
         }
+
+        .links {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .links a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
         .message {
-            margin-top: 20px;
+            margin-top: 1rem;
             padding: 10px;
             border-radius: 4px;
             text-align: center;
+            display: none;
         }
+
         .success {
-            background-color: #dff0d8;
-            color: #3c763d;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
         }
+
         .error {
-            background-color: #f2dede;
-            color: #a94442;
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>语言偏好设置</h1>
-        <div id="message" class="message" style="display: none;"></div>
+        <h1 id="title">语言偏好设置</h1>
+        <div id="message" class="message"></div>
         
         <div class="form-group">
-            <label for="language">选择语言：</label>
-            <select id="language">
-                <option value="zh">中文</option>
-                <option value="en">English</option>
-            </select>
+            <label for="language-search" id="label-search">搜索语言：</label>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="language-search" placeholder="输入语言名称搜索...">
+            </div>
+            
+            <div class="language-list" id="language-list">
+                <!-- 语言列表将通过JavaScript动态生成 -->
+            </div>
         </div>
         
-        <button class="btn" id="saveBtn">保存设置</button>
+        <button id="saveBtn">保存设置</button>
         
-        <div style="margin-top: 20px; text-align: center;">
-            <a href="login.html">返回登录页面</a>
+        <div class="links">
+            <a href="login.html" id="back-to-login">返回登录页面</a>
         </div>
     </div>
 
     <script>
+        // 语言列表 - 支持扩展到100+语言
+        const languages = [
+            { code: 'zh', name: '中文 (Chinese)', localName: '中文' },
+            { code: 'en', name: 'English', localName: 'English' },
+            { code: 'es', name: 'Spanish', localName: 'Español' },
+            { code: 'fr', name: 'French', localName: 'Français' },
+            { code: 'de', name: 'German', localName: 'Deutsch' },
+            { code: 'it', name: 'Italian', localName: 'Italiano' },
+            { code: 'ja', name: 'Japanese', localName: '日本語' },
+            { code: 'ko', name: 'Korean', localName: '한국어' },
+            { code: 'ru', name: 'Russian', localName: 'Русский' },
+            { code: 'pt', name: 'Portuguese', localName: 'Português' },
+            { code: 'ar', name: 'Arabic', localName: 'العربية' },
+            { code: 'hi', name: 'Hindi', localName: 'हिन्दी' },
+            { code: 'bn', name: 'Bengali', localName: 'বাংলা' },
+            { code: 'id', name: 'Indonesian', localName: 'Bahasa Indonesia' },
+            { code: 'tr', name: 'Turkish', localName: 'Türkçe' },
+            { code: 'vi', name: 'Vietnamese', localName: 'Tiếng Việt' },
+            { code: 'th', name: 'Thai', localName: 'ไทย' }
+            // 可以根据需要继续添加更多语言
+        ];
+
+        // 多语言支持
+        const translations = {
+            'zh': {
+                'title': '语言偏好设置',
+                'label-search': '搜索语言：',
+                'search-placeholder': '输入语言名称搜索...',
+                'save-button': '保存设置',
+                'back-to-login': '返回登录页面',
+                'message-success': '语言偏好已更新',
+                'message-error': '更新语言偏好时出错',
+                'message-auth-error': '您需要登录才能更改语言偏好',
+                'current-language': '当前语言'
+            },
+            'en': {
+                'title': 'Language Preferences',
+                'label-search': 'Search Languages:',
+                'search-placeholder': 'Type to search languages...',
+                'save-button': 'Save Settings',
+                'back-to-login': 'Back to Login',
+                'message-success': 'Language preference updated',
+                'message-error': 'Error updating language preference',
+                'message-auth-error': 'You need to be logged in to change language preferences',
+                'current-language': 'Current language'
+            }
+        };
+
+        // 获取URL参数
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            
+            params.clientId = urlParams.get('client_id');
+            params.redirectUri = urlParams.get('redirect_uri');
+            params.responseType = urlParams.get('response_type');
+            params.scope = urlParams.get('scope');
+            params.state = urlParams.get('state');
+            params.language = urlParams.get('lang');
+            
+            return params;
+        }
+
+        // 应用当前语言翻译
+        function applyLanguage(lang) {
+            if (!translations[lang]) {
+                lang = 'zh'; // 默认中文
+            }
+            
+            // 更新页面上的所有文本
+            document.getElementById('title').textContent = translations[lang]['title'];
+            document.getElementById('label-search').textContent = translations[lang]['label-search'];
+            document.getElementById('language-search').placeholder = translations[lang]['search-placeholder'];
+            document.getElementById('saveBtn').textContent = translations[lang]['save-button'];
+            document.getElementById('back-to-login').textContent = translations[lang]['back-to-login'];
+
+            // 更新页面标题
+            document.title = translations[lang]['title'];
+            
+            // 保存语言选择（不通过API，仅本地保存）
+            localStorage.setItem('preferred_language', lang);
+            
+            // 在语言列表中标记当前选择的语言
+            renderLanguageList(lang);
+            
+            // 更新链接中的语言参数
+            updateLinksWithParams(lang);
+        }
+        
+        // 更新链接以保留URL参数
+        function updateLinksWithParams(lang) {
+            const params = getUrlParams();
+            
+            // 获取所有链接
+            const links = document.querySelectorAll('a');
+            
+            links.forEach(link => {
+                const url = new URL(link.href);
+                const baseUrl = url.origin + url.pathname;
+                const urlParams = new URLSearchParams();
+                
+                // 添加所有参数
+                if (params.clientId) urlParams.set('client_id', params.clientId);
+                if (params.redirectUri) urlParams.set('redirect_uri', params.redirectUri);
+                if (params.responseType) urlParams.set('response_type', params.responseType);
+                if (params.scope) urlParams.set('scope', params.scope);
+                if (params.state) urlParams.set('state', params.state);
+                
+                // 设置当前语言
+                urlParams.set('lang', lang);
+                
+                // 更新链接
+                link.href = baseUrl + '?' + urlParams.toString();
+            });
+        }
+
+        // 显示消息
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // 渲染语言列表
+        function renderLanguageList(selectedLang) {
+            const languageList = document.getElementById('language-list');
+            const searchTerm = document.getElementById('language-search').value.toLowerCase();
+            
+            // 清空当前列表
+            languageList.innerHTML = '';
+            
+            // 筛选语言
+            const filteredLanguages = languages.filter(lang => 
+                lang.name.toLowerCase().includes(searchTerm) || 
+                lang.localName.toLowerCase().includes(searchTerm) ||
+                lang.code.toLowerCase().includes(searchTerm)
+            );
+            
+            // 创建语言选项
+            filteredLanguages.forEach(lang => {
+                const option = document.createElement('div');
+                option.className = `language-option ${lang.code === selectedLang ? 'selected' : ''}`;
+                option.dataset.code = lang.code;
+                
+                let displayText = `${lang.localName} (${lang.name})`;
+                
+                // 如果这是当前选择的语言，添加标记
+                if (lang.code === selectedLang) {
+                    const currentLang = document.createElement('span');
+                    currentLang.className = 'current-lang';
+                    currentLang.textContent = ` ✓ ${translations[selectedLang]['current-language']}`;
+                    option.innerHTML = displayText;
+                    option.appendChild(currentLang);
+                } else {
+                    option.textContent = displayText;
+                }
+                
+                // 添加点击事件
+                option.addEventListener('click', () => {
+                    selectLanguage(lang.code);
+                });
+                
+                languageList.appendChild(option);
+            });
+            
+            // 如果没有匹配的语言
+            if (filteredLanguages.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.className = 'language-option';
+                noResult.textContent = '没有找到匹配的语言 / No matching languages found';
+                languageList.appendChild(noResult);
+            }
+        }
+
+        // 选择语言
+        function selectLanguage(langCode) {
+            // 更新所有选择器的状态
+            document.querySelectorAll('.language-option').forEach(option => {
+                if (option.dataset.code === langCode) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+            
+            // 应用语言
+            applyLanguage(langCode);
+        }
+
+        // 保存语言偏好到服务器
+        async function saveLanguagePreference(langCode) {
+            const currentLang = localStorage.getItem('preferred_language') || 'zh';
+            
+            try {
+                const accessToken = localStorage.getItem('access_token');
+                
+                // 如果没有登录，提示错误
+                if (!accessToken) {
+                    showMessage(translations[currentLang]['message-auth-error'], 'error');
+                    return;
+                }
+                
+                const response = await fetch('/api/users/language', {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ language: langCode })
+                });
+                
+                if (response.ok) {
+                    showMessage(translations[currentLang]['message-success'], 'success');
+                } else {
+                    showMessage(translations[currentLang]['message-error'], 'error');
+                }
+            } catch (error) {
+                console.error('Error saving language preference:', error);
+                showMessage(translations[currentLang]['message-error'], 'error');
+            }
+        }
+
+        // 初始化
         document.addEventListener('DOMContentLoaded', function() {
+            const params = getUrlParams();
+            const savedLang = localStorage.getItem('preferred_language');
+            const currentLang = params.language || savedLang || 'zh';
+            
+            // 应用当前语言
+            applyLanguage(currentLang);
+            
+            // 搜索框事件
+            document.getElementById('language-search').addEventListener('input', () => {
+                renderLanguageList(localStorage.getItem('preferred_language') || 'zh');
+            });
+            
+            // 保存按钮事件
+            document.getElementById('saveBtn').addEventListener('click', async () => {
+                const currentLang = localStorage.getItem('preferred_language') || 'zh';
+                await saveLanguagePreference(currentLang);
+            });
+            
             // 检查用户是否已登录
             const accessToken = localStorage.getItem('access_token');
             if (!accessToken) {
-                window.location.href = 'login.html';
-                return;
+                // 如果没有登录，可以仍然允许用户更改语言偏好，但不会保存到服务器
+                document.getElementById('message').textContent = translations[currentLang]['message-auth-error'];
+                document.getElementById('message').className = 'message error';
+                document.getElementById('message').style.display = 'block';
+            } else {
+                // 如果已登录，获取用户的当前语言偏好
+                fetchUserProfile();
             }
-            
-            // 获取当前语言偏好
-            fetchUserProfile();
-            
-            // 添加保存按钮事件
-            document.getElementById('saveBtn').addEventListener('click', updateLanguage);
         });
         
+        // 获取用户的语言偏好
         async function fetchUserProfile() {
             try {
                 const accessToken = localStorage.getItem('access_token');
+                const currentLang = localStorage.getItem('preferred_language') || 'zh';
+                
                 const response = await fetch('/api/users/profile', {
                     method: 'GET',
                     headers: {
@@ -123,54 +468,14 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    // 设置当前语言选项
-                    document.getElementById('language').value = data.preferredLanguage || 'zh';
-                } else {
-                    showMessage('获取用户信息失败，请重新登录', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                    // 如果用户有已保存的语言偏好，应用它
+                    if (data.preferredLanguage) {
+                        applyLanguage(data.preferredLanguage);
+                    }
                 }
             } catch (error) {
-                showMessage('获取用户信息时发生错误', 'error');
+                console.error('Error fetching user profile:', error);
             }
-        }
-        
-        async function updateLanguage() {
-            try {
-                const language = document.getElementById('language').value;
-                const accessToken = localStorage.getItem('access_token');
-                
-                const response = await fetch('/api/users/language', {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ language })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    showMessage(language === 'zh' ? '语言偏好已更新为中文' : 'Language preference updated to English', 'success');
-                } else {
-                    const error = await response.json();
-                    showMessage(`更新失败: ${error.message || '未知错误'}`, 'error');
-                }
-            } catch (error) {
-                showMessage('更新语言偏好时发生错误', 'error');
-            }
-        }
-        
-        function showMessage(message, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = message;
-            messageEl.className = `message ${type}`;
-            messageEl.style.display = 'block';
-            
-            setTimeout(() => {
-                messageEl.style.display = 'none';
-            }, 3000);
         }
     </script>
 </body>

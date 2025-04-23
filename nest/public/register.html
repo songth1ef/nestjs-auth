@@ -1,165 +1,464 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>注册</title>
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #ddd;
+            --error-color: #f44336;
+            --success-color: #4CAF50;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px 0;
         }
+
         .container {
-            background-color: white;
+            background-color: var(--card-bg);
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
         }
+
+        .language-selector {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+        }
+
+        .language-dropdown {
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            cursor: pointer;
+        }
+
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 1.5rem;
+            padding-top: 0.5rem;
         }
+
         .form-group {
             margin-bottom: 1rem;
         }
+
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #666;
+            color: var(--light-text);
         }
+
         input {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 1rem;
         }
+
         button {
             width: 100%;
             padding: 0.75rem;
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: var(--primary-hover);
         }
+
         .error {
-            color: red;
+            color: var(--error-color);
             font-size: 0.875rem;
             margin-top: 0.25rem;
             display: none;
         }
-        .login-link {
+
+        .links {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
-        .login-link a {
-            color: #4CAF50;
+
+        .links a {
+            color: var(--primary-color);
             text-decoration: none;
+            font-size: 0.9rem;
         }
-        .login-link a:hover {
+
+        .links a:hover {
             text-decoration: underline;
         }
+
         .password-requirements {
             font-size: 0.75rem;
-            color: #666;
+            color: var(--light-text);
             margin-top: 0.25rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>注册</h1>
+        <div class="language-selector">
+            <select id="language-dropdown" class="language-dropdown">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <h1 id="title">注册</h1>
         <form id="registerForm">
             <div class="form-group">
-                <label for="username">用户名</label>
+                <label for="username" id="label-username">用户名</label>
                 <input type="text" id="username" required>
                 <div id="usernameError" class="error"></div>
             </div>
             <div class="form-group">
-                <label for="email">电子邮箱</label>
+                <label for="email" id="label-email">电子邮箱</label>
                 <input type="email" id="email" required>
                 <div id="emailError" class="error"></div>
             </div>
             <div class="form-group">
-                <label for="password">密码</label>
+                <label for="password" id="label-password">密码</label>
                 <input type="password" id="password" required>
-                <div class="password-requirements">
+                <div class="password-requirements" id="password-requirements">
                     密码必须包含大小写字母、数字和特殊字符，且长度至少为12位
                 </div>
                 <div id="passwordError" class="error"></div>
             </div>
-            <button type="submit">注册</button>
-            <div class="login-link">
-                已有账号？<a href="login.html">立即登录</a>
+            <div class="form-group">
+                <label for="confirmPassword" id="label-confirm-password">确认密码</label>
+                <input type="password" id="confirmPassword" required>
+                <div id="confirmPasswordError" class="error"></div>
+            </div>
+            <div id="generalError" class="error"></div>
+            <button type="submit" id="btn-register">注册</button>
+            <div class="links">
+                <a href="login.html" id="link-login">已有账号？立即登录</a>
             </div>
         </form>
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // 多语言支持
+        const translations = {
+            'zh': {
+                'title': '注册',
+                'label-username': '用户名',
+                'label-email': '电子邮箱',
+                'label-password': '密码',
+                'label-confirm-password': '确认密码',
+                'password-requirements': '密码必须包含大小写字母、数字和特殊字符，且长度至少为12位',
+                'btn-register': '注册',
+                'link-login': '已有账号？立即登录',
+                'error-empty-username': '请输入用户名',
+                'error-empty-email': '请输入电子邮箱',
+                'error-invalid-email': '请输入有效的电子邮箱',
+                'error-empty-password': '请输入密码',
+                'error-password-mismatch': '两次输入的密码不一致',
+                'error-password-requirements': '密码必须符合要求',
+                'error-register-failed': '注册失败，请稍后重试',
+                'error-network': '网络错误，请稍后重试',
+                'success-register': '注册成功！'
+            },
+            'en': {
+                'title': 'Register',
+                'label-username': 'Username',
+                'label-email': 'Email',
+                'label-password': 'Password',
+                'label-confirm-password': 'Confirm Password',
+                'password-requirements': 'Password must contain uppercase and lowercase letters, numbers, and special characters, with a minimum length of 12 characters',
+                'btn-register': 'Register',
+                'link-login': 'Already have an account? Login',
+                'error-empty-username': 'Please enter a username',
+                'error-empty-email': 'Please enter an email',
+                'error-invalid-email': 'Please enter a valid email',
+                'error-empty-password': 'Please enter a password',
+                'error-password-mismatch': 'Passwords do not match',
+                'error-password-requirements': 'Password must meet requirements',
+                'error-register-failed': 'Registration failed, please try again later',
+                'error-network': 'Network error, please try again later',
+                'success-register': 'Registration successful!'
+            }
+        };
+
+        // 获取URL参数
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
             
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            // 提取常见的OAuth参数
+            params.clientId = urlParams.get('client_id');
+            params.redirectUri = urlParams.get('redirect_uri');
+            params.responseType = urlParams.get('response_type');
+            params.scope = urlParams.get('scope');
+            params.state = urlParams.get('state');
+            params.language = urlParams.get('lang');
             
-            try {
-                const response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password,
-                        email: email
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    alert('注册成功！');
-                    window.location.href = 'login.html';
-                } else {
-                    if (data.message) {
-                        if (Array.isArray(data.message)) {
-                            data.message.forEach(msg => {
-                                if (msg.includes('用户名')) {
-                                    document.getElementById('usernameError').style.display = 'block';
-                                    document.getElementById('usernameError').textContent = msg;
-                                } else if (msg.includes('邮箱')) {
-                                    document.getElementById('emailError').style.display = 'block';
-                                    document.getElementById('emailError').textContent = msg;
-                                } else if (msg.includes('密码')) {
-                                    document.getElementById('passwordError').style.display = 'block';
-                                    document.getElementById('passwordError').textContent = msg;
-                                }
-                            });
-                        } else {
-                            document.getElementById('usernameError').style.display = 'block';
-                            document.getElementById('usernameError').textContent = data.message;
-                        }
+            return params;
+        }
+
+        // 应用语言
+        function applyLanguage(lang) {
+            if (!translations[lang]) {
+                lang = 'zh'; // 默认为中文
+            }
+            
+            // 设置语言选择器的值
+            document.getElementById('language-dropdown').value = lang;
+            
+            // 更新页面上的所有文本
+            for (const key in translations[lang]) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+                        element.value = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
                     }
                 }
-            } catch (error) {
-                console.error('注册失败:', error);
-                document.getElementById('usernameError').style.display = 'block';
-                document.getElementById('usernameError').textContent = '注册失败，请稍后重试';
             }
+            
+            // 更新页面标题
+            document.title = translations[lang]['title'];
+            
+            // 保存语言选择
+            localStorage.setItem('preferred_language', lang);
+            
+            // 更新链接中的语言参数
+            updateLinksWithParams();
+        }
+
+        // 更新链接以保留URL参数
+        function updateLinksWithParams() {
+            const params = getUrlParams();
+            const lang = document.getElementById('language-dropdown').value;
+            
+            // 获取所有链接
+            const links = document.querySelectorAll('a');
+            
+            links.forEach(link => {
+                const url = new URL(link.href);
+                const baseUrl = url.origin + url.pathname;
+                const urlParams = new URLSearchParams();
+                
+                // 添加所有参数
+                if (params.clientId) urlParams.set('client_id', params.clientId);
+                if (params.redirectUri) urlParams.set('redirect_uri', params.redirectUri);
+                if (params.responseType) urlParams.set('response_type', params.responseType);
+                if (params.scope) urlParams.set('scope', params.scope);
+                if (params.state) urlParams.set('state', params.state);
+                
+                // 设置当前语言
+                urlParams.set('lang', lang);
+                
+                // 更新链接
+                link.href = baseUrl + '?' + urlParams.toString();
+            });
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        // 隐藏错误信息
+        function hideError(elementId) {
+            const element = document.getElementById(elementId);
+            element.textContent = '';
+            element.style.display = 'none';
+        }
+
+        // 检查密码是否符合要求
+        function checkPasswordRequirements(password) {
+            // 至少12位
+            if (password.length < 12) return false;
+            
+            // 至少包含一个大写字母
+            if (!/[A-Z]/.test(password)) return false;
+            
+            // 至少包含一个小写字母
+            if (!/[a-z]/.test(password)) return false;
+            
+            // 至少包含一个数字
+            if (!/[0-9]/.test(password)) return false;
+            
+            // 至少包含一个特殊字符
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
+            
+            return true;
+        }
+
+        // 验证邮箱格式
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = getUrlParams();
+            const savedLang = localStorage.getItem('preferred_language');
+            
+            // 设置语言：优先使用URL参数中的语言，其次是保存的语言偏好，最后默认为中文
+            const currentLang = params.language || savedLang || 'zh';
+            applyLanguage(currentLang);
+            
+            // 语言选择器变更事件
+            document.getElementById('language-dropdown').addEventListener('change', function() {
+                applyLanguage(this.value);
+            });
+            
+            // 注册表单提交事件
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const lang = document.getElementById('language-dropdown').value;
+                
+                // 清除错误信息
+                hideError('usernameError');
+                hideError('emailError');
+                hideError('passwordError');
+                hideError('confirmPasswordError');
+                hideError('generalError');
+                
+                // 验证表单
+                let hasError = false;
+                if (!username) {
+                    showError('usernameError', translations[lang]['error-empty-username']);
+                    hasError = true;
+                }
+                
+                if (!email) {
+                    showError('emailError', translations[lang]['error-empty-email']);
+                    hasError = true;
+                } else if (!isValidEmail(email)) {
+                    showError('emailError', translations[lang]['error-invalid-email']);
+                    hasError = true;
+                }
+                
+                if (!password) {
+                    showError('passwordError', translations[lang]['error-empty-password']);
+                    hasError = true;
+                } else if (!checkPasswordRequirements(password)) {
+                    showError('passwordError', translations[lang]['error-password-requirements']);
+                    hasError = true;
+                }
+                
+                if (password !== confirmPassword) {
+                    showError('confirmPasswordError', translations[lang]['error-password-mismatch']);
+                    hasError = true;
+                }
+                
+                if (hasError) return;
+                
+                // 构建注册请求
+                try {
+                    // 准备提交的数据
+                    const registerData = {
+                        username: username,
+                        email: email,
+                        password: password
+                    };
+                    
+                    // 如果有clientId，添加到请求中
+                    if (params.clientId) {
+                        registerData.client_id = params.clientId;
+                    }
+                    
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(registerData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // 注册成功，重定向到登录页面或其他地方
+                        alert(translations[lang]['success-register']);
+                        // 构建登录页面的URL，传递相同的参数
+                        const loginUrl = new URL('login.html', window.location.origin);
+                        const urlParams = new URLSearchParams();
+                        
+                        if (params.clientId) urlParams.set('client_id', params.clientId);
+                        if (params.redirectUri) urlParams.set('redirect_uri', params.redirectUri);
+                        if (params.responseType) urlParams.set('response_type', params.responseType);
+                        if (params.scope) urlParams.set('scope', params.scope);
+                        if (params.state) urlParams.set('state', params.state);
+                        urlParams.set('lang', lang);
+                        
+                        window.location.href = `${loginUrl}?${urlParams.toString()}`;
+                    } else {
+                        // 注册失败，显示错误信息
+                        if (data.message) {
+                            if (Array.isArray(data.message)) {
+                                data.message.forEach(msg => {
+                                    if (msg.includes('用户名') || msg.includes('username')) {
+                                        showError('usernameError', msg);
+                                    } else if (msg.includes('邮箱') || msg.includes('email')) {
+                                        showError('emailError', msg);
+                                    } else if (msg.includes('密码') || msg.includes('password')) {
+                                        showError('passwordError', msg);
+                                    } else {
+                                        showError('generalError', msg);
+                                    }
+                                });
+                            } else {
+                                showError('generalError', data.message);
+                            }
+                        } else {
+                            showError('generalError', translations[lang]['error-register-failed']);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Registration failed:', error);
+                    showError('generalError', translations[lang]['error-network']);
+                }
+            });
         });
     </script>
 </body>

@@ -1,136 +1,380 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录</title>
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #ddd;
+            --error-color: #f44336;
+            --success-color: #4CAF50;
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            color: var(--text-color);
         }
+
         .container {
-            background-color: white;
+            background-color: var(--card-bg);
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 360px;
+            position: relative;
         }
+
+        .language-selector {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+        }
+
+        .language-dropdown {
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            cursor: pointer;
+        }
+
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 1.5rem;
+            padding-top: 0.5rem;
         }
+
         .form-group {
             margin-bottom: 1rem;
         }
+
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #666;
+            color: var(--light-text);
         }
+
         input {
             width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
-            box-sizing: border-box;
+            font-size: 1rem;
         }
+
         button {
             width: 100%;
             padding: 0.75rem;
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: var(--primary-hover);
         }
+
         .error {
-            color: red;
+            color: var(--error-color);
             font-size: 0.875rem;
             margin-top: 0.25rem;
             display: none;
         }
-        .register-link {
+
+        .links {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
         }
-        .register-link a {
-            color: #4CAF50;
+
+        .links a {
+            color: var(--primary-color);
             text-decoration: none;
+            font-size: 0.9rem;
         }
-        .register-link a:hover {
+
+        .links a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>登录</h1>
+        <div class="language-selector">
+            <select id="language-dropdown" class="language-dropdown">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <h1 id="title">登录</h1>
         <form id="loginForm">
             <div class="form-group">
-                <label for="username">用户名</label>
+                <label for="username" id="label-username">用户名</label>
                 <input type="text" id="username" required>
                 <div id="usernameError" class="error"></div>
             </div>
             <div class="form-group">
-                <label for="password">密码</label>
+                <label for="password" id="label-password">密码</label>
                 <input type="password" id="password" required>
                 <div id="passwordError" class="error"></div>
             </div>
-            <button type="submit">登录</button>
-            <div class="register-link">
-                还没有账号？<a href="register.html">立即注册</a>
+            <div id="generalError" class="error"></div>
+            <button type="submit" id="btn-login">登录</button>
+            <div class="links">
+                <a href="register.html" id="link-register">注册账号</a>
+                <a href="forgot-password.html" id="link-forgot">忘记密码？</a>
             </div>
         </form>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // 多语言支持
+        const translations = {
+            'zh': {
+                'title': '登录',
+                'label-username': '用户名',
+                'label-password': '密码',
+                'btn-login': '登录',
+                'link-register': '注册账号',
+                'link-forgot': '忘记密码？',
+                'error-empty-username': '请输入用户名',
+                'error-empty-password': '请输入密码',
+                'error-login-failed': '登录失败，请检查用户名和密码',
+                'error-network': '网络错误，请稍后重试',
+                'success-login': '登录成功！'
+            },
+            'en': {
+                'title': 'Login',
+                'label-username': 'Username',
+                'label-password': 'Password',
+                'btn-login': 'Login',
+                'link-register': 'Register',
+                'link-forgot': 'Forgot Password?',
+                'error-empty-username': 'Please enter your username',
+                'error-empty-password': 'Please enter your password',
+                'error-login-failed': 'Login failed, please check your username and password',
+                'error-network': 'Network error, please try again later',
+                'success-login': 'Login successful!'
+            }
+        };
+
+        // 获取URL参数
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            // 提取常见的OAuth参数
+            params.clientId = urlParams.get('client_id');
+            params.redirectUri = urlParams.get('redirect_uri');
+            params.responseType = urlParams.get('response_type');
+            params.scope = urlParams.get('scope');
+            params.state = urlParams.get('state');
+            params.language = urlParams.get('lang');
             
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+            return params;
+        }
+
+        // 应用语言
+        function applyLanguage(lang) {
+            if (!translations[lang]) {
+                lang = 'zh'; // 默认为中文
+            }
+            
+            // 设置语言选择器的值
+            document.getElementById('language-dropdown').value = lang;
+            
+            // 更新页面上的所有文本
+            for (const key in translations[lang]) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'BUTTON') {
+                        element.value = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            }
+            
+            // 更新页面标题
+            document.title = translations[lang]['title'];
+            
+            // 保存语言选择
+            localStorage.setItem('preferred_language', lang);
+            
+            // 更新链接中的语言参数
+            updateLinksWithParams();
+        }
+
+        // 更新链接以保留URL参数
+        function updateLinksWithParams() {
+            const params = getUrlParams();
+            const lang = document.getElementById('language-dropdown').value;
+            
+            // 获取所有链接
+            const links = document.querySelectorAll('a');
+            
+            links.forEach(link => {
+                const url = new URL(link.href);
+                const baseUrl = url.origin + url.pathname;
+                const urlParams = new URLSearchParams();
+                
+                // 添加所有参数
+                if (params.clientId) urlParams.set('client_id', params.clientId);
+                if (params.redirectUri) urlParams.set('redirect_uri', params.redirectUri);
+                if (params.responseType) urlParams.set('response_type', params.responseType);
+                if (params.scope) urlParams.set('scope', params.scope);
+                if (params.state) urlParams.set('state', params.state);
+                
+                // 设置当前语言
+                urlParams.set('lang', lang);
+                
+                // 更新链接
+                link.href = baseUrl + '?' + urlParams.toString();
+            });
+        }
+
+        // 显示错误信息
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        // 隐藏错误信息
+        function hideError(elementId) {
+            const element = document.getElementById(elementId);
+            element.textContent = '';
+            element.style.display = 'none';
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = getUrlParams();
+            const savedLang = localStorage.getItem('preferred_language');
+            
+            // 设置语言：优先使用URL参数中的语言，其次是保存的语言偏好，最后默认为中文
+            const currentLang = params.language || savedLang || 'zh';
+            applyLanguage(currentLang);
+            
+            // 语言选择器变更事件
+            document.getElementById('language-dropdown').addEventListener('change', function() {
+                applyLanguage(this.value);
+            });
+            
+            // 登录表单提交事件
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const lang = document.getElementById('language-dropdown').value;
+                
+                // 清除错误信息
+                hideError('usernameError');
+                hideError('passwordError');
+                hideError('generalError');
+                
+                // 验证表单
+                let hasError = false;
+                if (!username) {
+                    showError('usernameError', translations[lang]['error-empty-username']);
+                    hasError = true;
+                }
+                if (!password) {
+                    showError('passwordError', translations[lang]['error-empty-password']);
+                    hasError = true;
+                }
+                if (hasError) return;
+                
+                // 构建登录请求
+                try {
+                    // 准备提交的数据
+                    const loginData = {
                         username: username,
                         password: password
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // 保存令牌
-                    localStorage.setItem('access_token', data.access_token);
-                    localStorage.setItem('refresh_token', data.refresh_token);
-                    alert('登录成功！');
-                    // 可以在这里添加跳转到其他页面的逻辑
-                } else {
-                    document.getElementById('usernameError').style.display = 'block';
-                    document.getElementById('usernameError').textContent = data.message || '登录失败';
+                    };
+                    
+                    // 如果有clientId，添加到请求中
+                    if (params.clientId) {
+                        loginData.client_id = params.clientId;
+                    }
+                    
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(loginData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // 登录成功
+                        localStorage.setItem('access_token', data.access_token);
+                        localStorage.setItem('refresh_token', data.refresh_token);
+                        
+                        // 如果存在重定向URI，重定向到指定URL
+                        if (params.redirectUri) {
+                            const redirectUrl = new URL(params.redirectUri);
+                            
+                            // 添加授权码或token（取决于response_type）
+                            if (params.responseType === 'code' && data.code) {
+                                redirectUrl.searchParams.append('code', data.code);
+                            } else if (params.responseType === 'token' && data.access_token) {
+                                redirectUrl.searchParams.append('access_token', data.access_token);
+                            }
+                            
+                            // 添加state参数（如果有）
+                            if (params.state) {
+                                redirectUrl.searchParams.append('state', params.state);
+                            }
+                            
+                            window.location.href = redirectUrl.toString();
+                        } else {
+                            // 没有重定向URL，显示成功信息或跳转到默认页面
+                            alert(translations[lang]['success-login']);
+                            window.location.href = 'protected.html';
+                        }
+                    } else {
+                        // 登录失败
+                        showError('generalError', data.message || translations[lang]['error-login-failed']);
+                    }
+                } catch (error) {
+                    console.error('Login failed:', error);
+                    showError('generalError', translations[lang]['error-network']);
                 }
-            } catch (error) {
-                console.error('登录失败:', error);
-                document.getElementById('usernameError').style.display = 'block';
-                document.getElementById('usernameError').textContent = '登录失败，请稍后重试';
-            }
+            });
         });
     </script>
 </body>
